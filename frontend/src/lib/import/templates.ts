@@ -64,7 +64,7 @@ export const MIGRATION_TEMPLATES: Record<MigrationDataType, TemplateSpec> = {
     fieldGuide: [
       { field: 'transaction_date', hint: 'Tanggal transaksi: 2026-10-20 atau 20/10/2026', required: true },
       { field: 'payment_method', hint: 'Metode bayar — tulis persis salah satu:', allowed: ['CASH', 'QRIS'], required: true },
-      { field: 'sku', hint: 'SKU yang sudah ada di katalog cabang yang dipilih', required: true },
+      { field: 'sku', hint: 'Kode produk yang sudah ada di katalog cabang', required: true },
       { field: 'quantity', hint: 'Jumlah terjual, angka ≥ 1', required: true },
       { field: 'unit_price', hint: 'Harga satuan rupiah, angka ≥ 0 — kosongkan untuk harga katalog', required: false },
     ],

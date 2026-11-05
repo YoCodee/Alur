@@ -15,7 +15,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Alur — Platform Audit Multi-Cabang & Smart Voice POS UMKM",
+  title: "Alur",
   description:
     "Platform POS dan audit multi-cabang dengan input suara cerdas, auto-ledger laba rugi real-time, dan asisten keputusan 3 pertanyaan pagi berbasis deteksi anomali untuk UMKM.",
   icons: {

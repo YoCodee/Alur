@@ -240,7 +240,10 @@ export default function AppLayout({
                 <div className="flex items-center gap-1.5">
                   <span className="font-sans text-sm font-extrabold tracking-tight text-stone-900">Alur</span>
                   <span className="text-[10px] text-stone-300">•</span>
-                  <p className="truncate text-xs font-medium text-stone-600">
+                  <p
+                    className="truncate text-xs font-medium text-stone-600"
+                    title={profile?.org_name || 'POS'}
+                  >
                     {profile?.org_name || 'POS'}
                   </p>
                 </div>
@@ -348,18 +351,18 @@ export default function AppLayout({
             </Link>
           </div>
 
-          {/* Tombol Panduan Tur Fitur Aplikasi (Driver.js) */}
+          {/* Tombol Panduan Fitur */}
           <div className="shrink-0 border-t border-stone-100 bg-white px-3 py-1.5">
             <button
               id="tour-trigger-btn"
               type="button"
               onClick={startTour}
               className="group flex w-full items-center justify-between rounded-lg border border-stone-200 bg-white px-2.5 py-2 text-[13px] font-medium text-stone-600 transition-colors hover:border-stone-300 hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/25"
-              title="Mulai tur pemandu interaktif"
+              title="Lihat panduan fitur"
             >
               <div className="flex min-w-0 items-center">
                 <Compass className="mr-2.5 h-4 w-4 shrink-0 text-orange-500 transition-transform group-hover:rotate-45" />
-                <span className="truncate">Panduan Tur Fitur</span>
+                <span className="truncate">Panduan Fitur</span>
               </div>
             </button>
           </div>
@@ -513,7 +516,7 @@ export default function AppLayout({
                 >
                   <div className="flex items-center">
                     <Compass className="mr-3 h-4 w-4 text-orange-500" />
-                    <span>Panduan Tur Fitur</span>
+                    <span>Panduan Fitur</span>
                   </div>
                 </button>
               </div>

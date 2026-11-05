@@ -194,11 +194,11 @@ export function SyncCardDemo() {
         </div>
 
         <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight leading-snug">
-          Satu Platform untuk POS, Stok, dan Keuangan
+          Transaksi dan stok dalam satu tempat
         </h3>
 
         <p className="text-xs sm:text-[13px] text-white/90 leading-relaxed">
-          Mulai dari kasir mencatat pesanan, gudang memutasi bahan baku, hingga pemilik memantau laba bersih harian — semua tersinkronisasi seketika dalam satu database aman tanpa modul terpisah.
+          Catat pesanan, pantau persediaan, dan tinjau laporan usaha dari satu aplikasi.
         </p>
       </div>
 
@@ -212,7 +212,7 @@ export function SyncCardDemo() {
 
         {/* Process Indicator Row */}
         <div className="flex items-center justify-between text-[11px] text-white/80 font-mono">
-          <span className="shrink-0">Sinkronisasi instan</span>
+          <span className="shrink-0">Informasi usaha</span>
 
           {/* Sinyal Jalur Data Beranimasi */}
           <div
@@ -227,7 +227,7 @@ export function SyncCardDemo() {
           </div>
 
           <span ref={metricRef} className="font-bold text-white shrink-0">
-            &lt; 100ms
+            Terhubung
           </span>
         </div>
       </div>

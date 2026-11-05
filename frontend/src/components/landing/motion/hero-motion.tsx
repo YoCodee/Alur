@@ -59,7 +59,7 @@ export function HeroMotion({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div ref={containerRef} className="w-full flex flex-col items-center justify-center">
+    <div ref={containerRef} className="w-full">
       {children}
     </div>
   );

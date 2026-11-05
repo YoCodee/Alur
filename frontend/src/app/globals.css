@@ -129,6 +129,40 @@
     background: linear-gradient(135deg, #F6821F 0%, #FA6400 45%, #E65A00 100%);
   }
 
+  @keyframes hero-workflow-flow {
+    0% { left: 0; opacity: 0; }
+    12% { opacity: 1; }
+    88% { opacity: 1; }
+    100% { left: calc(100% - 5px); opacity: 0; }
+  }
+
+  .hero-preview-flow-track {
+    overflow: hidden;
+  }
+
+  .hero-preview-flow-dot {
+    position: absolute;
+    top: -2px;
+    left: 0;
+    width: 5px;
+    height: 5px;
+    border-radius: 9999px;
+    opacity: 0;
+    background: #fff7ed;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.18);
+    animation: hero-workflow-flow 2.8s ease-in-out infinite;
+  }
+
+  .hero-preview-flow-dot-delayed {
+    animation-delay: 1.4s;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-preview-flow-dot {
+      animation: none;
+    }
+  }
+
   /* Angka tabular untuk nilai uang dan metrik finansial */
   .tabular-nums {
     font-variant-numeric: tabular-nums;
@@ -229,7 +263,11 @@
   padding: 18px 20px !important;
   max-width: 340px !important;
   background-color: #ffffff !important;
-  font-family: inherit !important;
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+.alur-tour-popover button {
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
 }
 
 .alur-tour-popover .driver-popover-title {

@@ -36,7 +36,7 @@ export function AppSplashProvider({ children }: { children: React.ReactNode }) {
       {mounted && showSplash && (
         <AlurSplashScreen
           oncePerSession={false}
-          durationMs={1850}
+          durationMs={3400}
           onFinish={() => {
             if (typeof window !== 'undefined') {
               window.sessionStorage.setItem('alur_splash_seen', 'true');

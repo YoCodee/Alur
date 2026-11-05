@@ -62,7 +62,7 @@ export function RoleGuard({ children, allowedRoles = ['OWNER'] }: RoleGuardProps
   if (loading) {
     return (
       <div className="min-h-[50vh] flex flex-col items-center justify-center space-y-2 text-slate-500">
-        <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+        <Loader2 className="w-6 h-6 animate-spin text-sage-600" />
         <span className="text-sm">Memeriksa hak akses...</span>
       </div>
     );

@@ -331,7 +331,7 @@ export default function PosPage() {
   if (loading) {
     return (
       <div className="py-24 flex flex-col items-center justify-center text-slate-400">
-        <Loader2 className="w-10 h-10 animate-spin text-enterprise-600 mb-3" />
+        <Loader2 className="w-10 h-10 animate-spin text-sage-600 mb-3" />
         <p className="text-sm font-medium text-slate-600">Memuat terminal kasir POS...</p>
       </div>
     );
@@ -363,7 +363,7 @@ export default function PosPage() {
         {/* Top Control Bar: Branch Selector + Status */}
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-lg bg-blue-50 text-enterprise-600 border border-blue-100 flex items-center justify-center shrink-0">
+            <div className="h-8 w-8 rounded-lg bg-brand-50 text-brand-600 border border-brand-100 flex items-center justify-center shrink-0">
               <Store className="w-4 h-4" />
             </div>
             <span className="text-xs font-semibold text-slate-500">Cabang Kasir:</span>
@@ -372,7 +372,7 @@ export default function PosPage() {
                 aria-label="Pilih cabang aktif"
                 value={selectedBranchId}
                 onChange={(e) => setSelectedBranchId(e.target.value)}
-                className="bg-slate-50 border border-slate-300 text-slate-900 text-xs rounded-lg px-3 py-1.5 focus:outline-hidden focus:ring-2 focus:ring-enterprise-500 font-bold"
+                className="bg-slate-50 border border-slate-300 text-slate-900 text-xs rounded-lg px-3 py-1.5 focus:outline-hidden focus:ring-2 focus:ring-brand-500 font-bold"
               >
                 {branches.map((b) => (
                   <option key={b.id} value={b.id}>
@@ -404,7 +404,7 @@ export default function PosPage() {
                 placeholder="Cari produk (nama / SKU)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-12 py-2.5 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-enterprise-500 shadow-xs"
+                className="w-full pl-10 pr-12 py-2.5 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-brand-500 shadow-xs"
               />
               {searchQuery && (
                 <button
@@ -429,7 +429,7 @@ export default function PosPage() {
                   onClick={() => setSelectedCategory(cat)}
                   className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer min-h-[36px] flex items-center ${
                     isActive
-                      ? 'bg-enterprise-600 text-white shadow-xs'
+                      ? 'bg-brand-500 text-white shadow-xs'
                       : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
                   }`}
                 >
@@ -444,7 +444,7 @@ export default function PosPage() {
         <div className="flex-1">
           {productLoading ? (
             <div className="py-20 flex flex-col items-center justify-center text-slate-400">
-              <Loader2 className="w-8 h-8 animate-spin text-enterprise-600 mb-2" />
+              <Loader2 className="w-8 h-8 animate-spin text-sage-600 mb-2" />
               <p className="text-xs">Memuat katalog menu...</p>
             </div>
           ) : filteredProducts.length === 0 ? (
@@ -474,8 +474,8 @@ export default function PosPage() {
                       isOutOfStock
                         ? 'bg-slate-50 border-slate-200 opacity-60 cursor-not-allowed'
                         : inCart
-                        ? 'bg-blue-50/60 border-enterprise-400 shadow-xs ring-1 ring-enterprise-400'
-                        : 'bg-white border-slate-200 hover:border-enterprise-300 hover:shadow-xs'
+                        ? 'bg-brand-50 border-brand-400 shadow-xs ring-1 ring-brand-400'
+                        : 'bg-white border-slate-200 hover:border-brand-300 hover:shadow-xs'
                     }`}
                   >
                     <div className="space-y-1.5">
@@ -499,7 +499,7 @@ export default function PosPage() {
                         )}
                       </div>
 
-                      <h3 className="text-xs sm:text-sm font-bold text-slate-800 line-clamp-2 leading-snug group-hover:text-enterprise-600 transition-colors">
+                      <h3 className="text-xs sm:text-sm font-bold text-slate-800 line-clamp-2 leading-snug group-hover:text-brand-600 transition-colors">
                         {p.name}
                       </h3>
 
@@ -514,11 +514,11 @@ export default function PosPage() {
                       </span>
 
                       {inCart ? (
-                        <span className="min-w-[28px] h-7 px-1.5 rounded-full bg-enterprise-600 text-white text-xs font-bold flex items-center justify-center shadow-xs">
+                        <span className="min-w-[28px] h-7 px-1.5 rounded-full bg-brand-500 text-white text-xs font-bold flex items-center justify-center shadow-xs">
                           {inCart.quantity}
                         </span>
                       ) : !isOutOfStock ? (
-                        <span className="h-7 w-7 rounded-full bg-slate-100 group-hover:bg-enterprise-600 group-hover:text-white text-slate-400 flex items-center justify-center transition-colors">
+                        <span className="h-7 w-7 rounded-full bg-slate-100 group-hover:bg-brand-500 group-hover:text-white text-slate-400 flex items-center justify-center transition-colors">
                           <Plus className="w-3.5 h-3.5" />
                         </span>
                       ) : null}
@@ -538,7 +538,7 @@ export default function PosPage() {
         {/* Cart Header */}
         <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/70">
           <div className="flex items-center gap-2">
-            <div className="h-7 w-7 rounded-md bg-blue-50 text-enterprise-600 flex items-center justify-center">
+            <div className="h-7 w-7 rounded-md bg-brand-50 text-brand-600 flex items-center justify-center">
               <ShoppingCart className="w-4 h-4" />
             </div>
             <h2 className="font-bold text-slate-900 text-sm">Pesanan Kasir</h2>
@@ -647,7 +647,7 @@ export default function PosPage() {
             </div>
             <div className="pt-2 border-t border-slate-200 flex justify-between items-baseline">
               <span className="text-xs sm:text-sm font-bold text-slate-900">Total Tagihan</span>
-              <span className="text-xl sm:text-2xl font-extrabold text-enterprise-600 font-mono">
+              <span className="text-xl sm:text-2xl font-extrabold text-brand-600 font-mono">
                 {formatRupiah(totalAmount)}
               </span>
             </div>
@@ -658,7 +658,7 @@ export default function PosPage() {
             size="touch"
             disabled={cart.length === 0}
             onClick={handleOpenPayment}
-            className="w-full bg-enterprise-600 hover:bg-enterprise-700 font-bold text-sm shadow-md shadow-enterprise-500/20 gap-2 select-none"
+            className="w-full bg-brand-500 hover:bg-brand-600 font-bold text-sm shadow-md shadow-brand-500/20 gap-2 select-none"
           >
             <CreditCard className="w-4 h-4" />
             <span>Bayar Sekarang ({formatRupiah(totalAmount)})</span>
@@ -694,11 +694,11 @@ export default function PosPage() {
 
             <div className="p-6 space-y-5">
               {/* Total Banner */}
-              <div className="bg-blue-50/80 border border-blue-200 rounded-xl p-4 text-center">
-                <span className="text-[11px] uppercase font-bold text-enterprise-700 tracking-wider">
+              <div className="bg-sage-50 border border-sage-200 rounded-xl p-4 text-center">
+                <span className="text-[11px] uppercase font-bold text-sage-700 tracking-wider">
                   Total yang Harus Dibayar
                 </span>
-                <p className="text-3xl font-extrabold text-enterprise-600 mt-1 font-mono">
+                <p className="text-3xl font-extrabold text-brand-600 mt-1 font-mono">
                   {formatRupiah(totalAmount)}
                 </p>
               </div>
@@ -717,11 +717,11 @@ export default function PosPage() {
                     }}
                     className={`p-3.5 rounded-xl border flex flex-col items-center gap-1.5 transition-all min-h-[44px] cursor-pointer ${
                       paymentMethod === 'CASH'
-                        ? 'border-enterprise-600 bg-blue-50/60 text-enterprise-700 ring-2 ring-enterprise-500/20'
+                        ? 'border-brand-500 bg-brand-50 text-brand-700 ring-2 ring-brand-500/20'
                         : 'border-slate-200 hover:border-slate-300 text-slate-600'
                     }`}
                   >
-                    <Banknote className="w-5 h-5 text-enterprise-600" />
+                    <Banknote className="w-5 h-5 text-sage-600" />
                     <span className="text-xs font-bold">Tunai (Cash)</span>
                   </button>
 
@@ -734,11 +734,11 @@ export default function PosPage() {
                     }}
                     className={`p-3.5 rounded-xl border flex flex-col items-center gap-1.5 transition-all min-h-[44px] cursor-pointer ${
                       paymentMethod === 'QRIS_SIM'
-                        ? 'border-enterprise-600 bg-blue-50/60 text-enterprise-700 ring-2 ring-enterprise-500/20'
+                        ? 'border-brand-500 bg-brand-50 text-brand-700 ring-2 ring-brand-500/20'
                         : 'border-slate-200 hover:border-slate-300 text-slate-600'
                     }`}
                   >
-                    <QrCode className="w-5 h-5 text-enterprise-600" />
+                    <QrCode className="w-5 h-5 text-sage-600" />
                     <span className="text-xs font-bold">QRIS Simulasi</span>
                   </button>
                 </div>
@@ -762,7 +762,7 @@ export default function PosPage() {
                         onChange={(e) =>
                           setCashTendered(e.target.value === '' ? '' : parseInt(e.target.value, 10))
                         }
-                        className="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl text-base font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-enterprise-500 font-mono"
+                        className="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl text-base font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-brand-500 font-mono"
                         placeholder="0"
                       />
                     </div>
@@ -777,7 +777,7 @@ export default function PosPage() {
                         onClick={() => setCashTendered(opt)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors cursor-pointer min-h-[36px] flex items-center ${
                           cashTendered === opt
-                            ? 'bg-enterprise-600 text-white border-enterprise-600'
+                            ? 'bg-brand-500 text-white border-brand-500'
                             : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                         }`}
                       >
@@ -858,7 +858,7 @@ export default function PosPage() {
                   size="touch"
                   disabled={submitting || isCashInsufficient}
                   onClick={() => handleProcessCheckout(false)}
-                  className="bg-enterprise-600 hover:bg-enterprise-700 text-white font-bold gap-2 px-6"
+                  className="bg-brand-500 hover:bg-brand-600 text-white font-bold gap-2 px-6"
                 >
                   {submitting ? (
                     <>
@@ -966,7 +966,7 @@ export default function PosPage() {
                 variant="primary"
                 size="touch"
                 onClick={() => setCompletedTx(null)}
-                className="flex-1 bg-enterprise-600 hover:bg-enterprise-700 gap-1.5"
+                className="flex-1 bg-brand-500 hover:bg-brand-600 gap-1.5"
               >
                 <RotateCcw className="w-4 h-4" />
                 <span>Transaksi Baru</span>

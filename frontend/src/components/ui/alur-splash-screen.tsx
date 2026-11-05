@@ -10,7 +10,7 @@ import {
 
 export interface AlurSplashScreenProps {
   /**
-   * Durasi total sebelum splash screen mulai memudar (default: 1800ms)
+   * Durasi total sebelum splash screen mulai memudar (default: 3400ms)
    */
   durationMs?: number;
   /**
@@ -21,10 +21,6 @@ export interface AlurSplashScreenProps {
    * Callback saat animasi selesai & splash screen mulai menutup
    */
   onFinish?: () => void;
-  /**
-   * Tampilkan tombol lewati kecil di pojok kanan atas
-   */
-  showSkipButton?: boolean;
 }
 
 /**
@@ -36,17 +32,16 @@ export interface AlurSplashScreenProps {
  * D. Easing modern (cubic-bezier), durasi total 1.5 - 2 detik dengan latar belakang putih bersih.
  */
 export function AlurSplashScreen({
-  durationMs = 1800,
+  durationMs = 3400,
   oncePerSession = false,
   onFinish,
-  showSkipButton = true,
 }: AlurSplashScreenProps) {
   // Status tahapan animasi:
   // 0: Initial (hidden / preparing)
-  // 1: Stroke drawing (0 - 850ms)
-  // 2: Fill & 3D shadow transition (850ms - 1100ms)
-  // 3: Text reveal (1100ms - 1700ms)
-  // 4: Exiting / Fade out (1700ms - 2100ms)
+  // 1: Stroke drawing (80 - 1180ms)
+  // 2: Fill & 3D shadow transition (1250ms - 1950ms)
+  // 3: Text reveal (1900ms - 2600ms)
+  // 4: Exiting / Fade out (3400 - 4100ms)
   // 5: Unmounted
   const [phase, setPhase] = useState<number>(0);
   const [visible, setVisible] = useState<boolean>(true);
@@ -61,7 +56,7 @@ export function AlurSplashScreen({
   const dismissImmediately = useCallback(() => {
     setPhase(4);
     onFinish?.();
-    setTimeout(() => setVisible(false), 250);
+    setTimeout(() => setVisible(false), 700);
   }, [onFinish]);
 
   useEffect(() => {
@@ -98,17 +93,17 @@ export function AlurSplashScreen({
     // 1. Frame awal: trigger stroke reveal
     const t0 = setTimeout(() => {
       setPhase(1);
-    }, 50);
+    }, 80);
 
     // 2. Tahap B: Fill & 3D shadows fade-in + micro scale pop
     const t1 = setTimeout(() => {
       setPhase(2);
-    }, 780);
+    }, 1250);
 
     // 3. Tahap C: Teks "alur" slide-in + fade-in
     const t2 = setTimeout(() => {
       setPhase(3);
-    }, 1080);
+    }, 1900);
 
     // 4. Tahap D: Fade out background putih
     const t3 = setTimeout(() => {
@@ -116,10 +111,10 @@ export function AlurSplashScreen({
       onFinish?.();
     }, durationMs);
 
-    // 5. Unmount dari DOM setelah transisi keluar selesai (400ms kemudian)
+    // 5. Unmount dari DOM setelah transisi keluar selesai
     const t4 = setTimeout(() => {
       setVisible(false);
-    }, durationMs + 450);
+    }, durationMs + 750);
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -151,7 +146,7 @@ export function AlurSplashScreen({
       role="dialog"
       aria-modal="true"
       aria-label="Memuat aplikasi Alur"
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-white select-none transition-opacity duration-400 ease-out ${
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-white select-none transition-opacity duration-700 ease-in-out ${
         isExiting ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
       style={{
@@ -159,28 +154,17 @@ export function AlurSplashScreen({
         backgroundColor: '#FFFFFF',
       }}
     >
-      {/* Tombol Lewati (Opsional & Diskret) */}
-      {showSkipButton && (
-        <button
-          type="button"
-          onClick={dismissImmediately}
-          className="absolute right-5 top-5 rounded-full border border-stone-200 bg-white/80 px-3 py-1 text-xs font-medium text-stone-400 backdrop-blur-sm transition-all hover:border-stone-300 hover:text-stone-700"
-        >
-          Lewati (Esc)
-        </button>
-      )}
-
       {/* Kontainer Animasi Utama */}
       <div className="flex flex-col items-center justify-center px-4">
         {/* Ikon Alur SVG dengan Lapisan Animasi */}
         <div
-          className={`relative flex items-center justify-center transition-transform duration-500 ${
+          className={`relative flex items-center justify-center transition-transform duration-700 ${
             isFillActive ? 'scale-100' : 'scale-95'
           }`}
           style={{
             width: 140,
             height: 140,
-            transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+            transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
           }}
         >
           <svg
@@ -234,7 +218,7 @@ export function AlurSplashScreen({
                 strokeDasharray={outerLength}
                 strokeDashoffset={isStrokeActive ? 0 : outerLength}
                 style={{
-                  transition: 'stroke-dashoffset 850ms cubic-bezier(0.16, 1, 0.3, 1)',
+                  transition: 'stroke-dashoffset 1100ms cubic-bezier(0.22, 1, 0.36, 1)',
                 }}
               />
 
@@ -245,7 +229,7 @@ export function AlurSplashScreen({
                 strokeDasharray={innerLength}
                 strokeDashoffset={isStrokeActive ? 0 : innerLength}
                 style={{
-                  transition: 'stroke-dashoffset 800ms cubic-bezier(0.16, 1, 0.3, 1) 80ms',
+                  transition: 'stroke-dashoffset 1050ms cubic-bezier(0.22, 1, 0.36, 1) 100ms',
                 }}
               />
             </g>
@@ -255,7 +239,7 @@ export function AlurSplashScreen({
             {/* ======================================================== */}
             <g
               id="splash-fill-layer"
-              className="transition-opacity duration-400 ease-out"
+              className="transition-opacity duration-700 ease-out"
               style={{
                 opacity: isFillActive ? 1 : 0,
               }}
@@ -288,11 +272,11 @@ export function AlurSplashScreen({
         {/* TAHAP C: TEXT REVEAL ("alur" dengan slide + fade-in) */}
         {/* ======================================================== */}
         <div
-          className="mt-6 flex flex-col items-center transition-all duration-500"
+          className="mt-6 flex flex-col items-center transition-all duration-700"
           style={{
             opacity: isTextActive ? 1 : 0,
             transform: isTextActive ? 'translateY(0px)' : 'translateY(12px)',
-            transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
+            transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
           }}
         >
           {/* Tipografi "alur" menggunakan font Plus Jakarta Sans */}

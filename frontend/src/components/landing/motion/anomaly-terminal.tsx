@@ -54,7 +54,7 @@ export function AnomalyTerminalDemo() {
         if (commandRowRef.current) gsap.set(commandRowRef.current, { display: 'none' });
         if (confirmedRowRef.current) gsap.set(confirmedRowRef.current, { display: 'flex', opacity: 1 });
         if (buttonRef.current) {
-          buttonRef.current.innerText = 'Terkirim ✓';
+          buttonRef.current.innerText = 'Selesai ✓';
           buttonRef.current.className = 'px-2.5 py-1 text-xs font-bold rounded-sm transition-colors cursor-pointer shrink-0 bg-emerald-600 text-white';
         }
       });
@@ -96,7 +96,7 @@ export function AnomalyTerminalDemo() {
           if (commandRowRef.current) gsap.set(commandRowRef.current, { display: 'flex', opacity: 1 });
           if (confirmedRowRef.current) gsap.set(confirmedRowRef.current, { display: 'none', opacity: 0 });
           if (buttonRef.current) {
-            buttonRef.current.innerText = 'Eksekusi ↵';
+            buttonRef.current.innerText = 'Tinjau';
             buttonRef.current.className = 'px-2.5 py-1 text-xs font-bold rounded-sm transition-colors cursor-pointer shrink-0 bg-brand-600 text-white';
           }
           if (consoleBoxRef.current) gsap.set(consoleBoxRef.current, { opacity: 1 });
@@ -191,7 +191,7 @@ export function AnomalyTerminalDemo() {
             gsap.fromTo(confirmedRowRef.current, { opacity: 0, x: -6 }, { opacity: 1, x: 0, duration: 0.3 });
           }
           if (buttonRef.current) {
-            buttonRef.current.innerText = 'Terkirim ✓';
+            buttonRef.current.innerText = 'Selesai ✓';
             buttonRef.current.className = 'px-2.5 py-1 text-xs font-bold rounded-sm transition-colors cursor-pointer shrink-0 bg-emerald-600 text-white';
           }
         });
@@ -248,13 +248,13 @@ export function AnomalyTerminalDemo() {
             Deteksi Dini Masalah Operasional
           </h3>
           <p className="text-xs sm:text-[13px] text-slate-600 leading-relaxed">
-            Algoritma Z-score dan asisten 3 Pertanyaan Pagi otomatis menganalisis lonjakan biaya, stok mati, dan potensi kebocoran margin kasir setiap fajar.
+            Tinjau perubahan pada transaksi, pengeluaran, dan persediaan agar hal yang perlu diperiksa lebih mudah terlihat.
           </p>
         </div>
 
         <div className="inline-flex items-center gap-1.5 text-xs text-brand-700 font-medium">
           <Activity className="h-3.5 w-3.5" />
-          <span>Pengawasan otomatis non-stop 24/7</span>
+          <span>Pemantauan aktivitas usaha</span>
         </div>
       </div>
 
@@ -270,7 +270,7 @@ export function AnomalyTerminalDemo() {
             className="text-slate-500 text-[11px] leading-tight select-none whitespace-nowrap overflow-hidden"
             style={{ clipPath: 'inset(0 0% 0 0)' }}
           >
-            Menjalankan mesin anomali Alur...
+            Memeriksa aktivitas usaha...
           </p>
 
           {/* Baris 2: Modul Pengawasan Aktif */}
@@ -279,22 +279,22 @@ export function AnomalyTerminalDemo() {
               ref={pulseDotRef}
               className="h-2 w-2 rounded-full bg-brand-600 shrink-0 origin-center"
             />
-            <span>3 modul pengawasan aktif</span>
+            <span>Ringkasan aktivitas</span>
           </p>
 
           {/* Baris 3: Tiga Sub-Baris Anomali */}
           <div ref={subRowsRef} className="space-y-1 pl-2 text-slate-700 text-[11px]">
             <div className="flex items-center justify-between">
-              <span className="text-slate-600">↳ beban-biaya</span>
-              <span className="text-slate-500 text-[10px]">scan Z-score • 0 lonjakan</span>
+              <span className="text-slate-600">↳ pengeluaran</span>
+              <span className="text-slate-500 text-[10px]">Tinjau catatan</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-slate-600">↳ kas-register</span>
-              <span className="text-emerald-700 font-medium text-[10px]">rekonsiliasi • selisih Rp 0</span>
+              <span className="text-slate-600">↳ penjualan</span>
+              <span className="text-emerald-700 font-medium text-[10px]">Catatan transaksi</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-slate-600">↳ stok-kritis</span>
-              <span className="text-amber-700 font-medium text-[10px]">batas minimum • 2 mutasi siap</span>
+              <span className="text-slate-600">↳ persediaan</span>
+              <span className="text-amber-700 font-medium text-[10px]">Tinjau kebutuhan stok</span>
             </div>
           </div>
         </div>
@@ -312,7 +312,7 @@ export function AnomalyTerminalDemo() {
               className="text-slate-700 whitespace-nowrap overflow-hidden"
               style={{ clipPath: 'inset(0 0% 0 0)' }}
             >
-              kirim_rekomendasi_mutasi
+              tinjau_ringkasan
             </span>
             <span ref={cursorRef} className="animate-pulse">
               _
@@ -325,7 +325,7 @@ export function AnomalyTerminalDemo() {
             className="hidden items-center gap-1.5 text-emerald-700 text-[11px] font-bold"
           >
             <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-            <span>2 mutasi dikirim ke dashboard</span>
+            <span>Ringkasan siap ditinjau</span>
           </div>
 
           <button
@@ -334,7 +334,7 @@ export function AnomalyTerminalDemo() {
             onClick={handleManualClick}
             className="px-2.5 py-1 text-xs font-bold rounded-sm transition-colors cursor-pointer shrink-0 bg-brand-600 text-white hover:bg-brand-700 origin-center select-none"
           >
-            Eksekusi ↵
+            Tinjau
           </button>
         </div>
       </div>

@@ -183,14 +183,14 @@ export default function BranchesPage() {
           <div>
             <div className="flex items-center gap-2.5">
               <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-                Kelola Cabang &amp; Kuota Gerai
+                 Kelola Cabang
               </h1>
               <Badge variant={isLimitReached ? 'warning' : 'enterprise'} dot>
                 {activeBranchCount} / 5 Cabang Aktif
               </Badge>
             </div>
             <p className="text-sm text-slate-500 mt-0.5">
-              Kelola gerai operasional, alamat cabang, target omzet harian, dan kuota multi-cabang (maksimal 5 cabang)
+              Atur lokasi cabang dan target penjualan harian.
             </p>
           </div>
 
@@ -206,24 +206,19 @@ export default function BranchesPage() {
           </Button>
         </div>
 
-        {/* 4-KPI Metric Strip */}
+        {/* Branch Summary */}
         <MetricStrip
-          title="Ringkasan Jaringan Cabang"
-          action={
-            <span className="text-xs text-slate-500 font-medium">
-              Ketentuan PRD: <strong className="text-slate-700">Maks. 5 Cabang/Organisasi</strong>
-            </span>
-          }
+          title="Ringkasan Cabang"
           metrics={[
             {
-              label: 'Total Cabang Terdata',
+              label: 'Jumlah Cabang',
               value: branches.length,
               subtext: `${activeBranchCount} cabang aktif beroperasi`,
-              badge: <Badge variant="enterprise">Multi-Cabang</Badge>,
+              badge: <Badge variant="brand">Cabang</Badge>,
             },
             {
-              label: 'Sisa Kuota Cabang',
-              value: `${Math.max(0, 5 - activeBranchCount)} Gerai`,
+              label: 'Sisa Slot Cabang',
+              value: `${Math.max(0, 5 - activeBranchCount)} slot`,
               subtext: isLimitReached ? 'Batas maksimal 5 cabang tercapai' : 'Dapat menambah gerai baru',
               badge: isLimitReached ? (
                 <Badge variant="danger" dot>
@@ -236,22 +231,12 @@ export default function BranchesPage() {
               ),
             },
             {
-              label: 'Akumulasi Target Harian',
+              label: 'Target Harian',
               value: formatRupiah(totalTarget),
-              subtext: 'Target omzet harian seluruh gerai',
+              subtext: 'Total target semua cabang aktif',
               badge: (
                 <Badge variant="brand" dot>
                   Target
-                </Badge>
-              ),
-            },
-            {
-              label: 'Status Kepatuhan Database',
-              value: '100% Valid',
-              subtext: 'RLS & trigger limit 5 cabang aktif',
-              badge: (
-                <Badge variant="success" dot>
-                  Tervalidasi
                 </Badge>
               ),
             },
@@ -310,7 +295,7 @@ export default function BranchesPage() {
             <EmptyState
               icon={Store}
               title="Belum Ada Cabang"
-              description="Tambahkan cabang pertama Anda atau gunakan akun demo untuk memuat data contoh 3 cabang."
+              description="Tambahkan cabang untuk mengatur lokasi dan target penjualannya."
               actionLabel="Tambah Cabang Sekarang"
               onAction={openCreateModal}
             />
@@ -326,7 +311,7 @@ export default function BranchesPage() {
                   <div className="flex items-start justify-between">
                     <div>
                       <div className="flex items-center gap-2">
-                        <Building2 className="w-4 h-4 text-enterprise-600 shrink-0" />
+                        <Building2 className="w-4 h-4 text-brand-600 shrink-0" />
                         <h2 className="text-base font-bold text-slate-900">{b.name}</h2>
                       </div>
                       <div className="flex items-center text-xs text-slate-500 mt-1 pl-6">
@@ -342,11 +327,11 @@ export default function BranchesPage() {
                   <div className="pt-3 border-t border-slate-100">
                     <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
                       <span className="flex items-center gap-1">
-                        <Target className="w-3.5 h-3.5 text-enterprise-600" />
+                        <Target className="w-3.5 h-3.5 text-brand-600" />
                         Target Omzet Harian:
                       </span>
                     </div>
-                    <p className="text-base font-mono font-bold text-enterprise-700">
+                    <p className="text-base font-mono font-bold text-brand-700">
                       {formatRupiah(b.daily_target)}
                     </p>
                   </div>
@@ -357,7 +342,7 @@ export default function BranchesPage() {
                     variant="ghost"
                     size="sm"
                     onClick={() => openEditModal(b)}
-                    className="h-8 w-8 p-0 text-slate-500 hover:text-enterprise-600 hover:bg-slate-100"
+                    className="h-8 w-8 p-0 text-slate-500 hover:text-brand-600 hover:bg-brand-50"
                     title="Ubah Cabang"
                   >
                     <Edit2 className="w-3.5 h-3.5" />
@@ -387,7 +372,7 @@ export default function BranchesPage() {
                     {editingBranch ? 'Ubah Data Cabang' : 'Tambah Cabang Baru'}
                   </h3>
                   <p className="text-xs text-slate-500">
-                    Maksimal 5 cabang aktif per organisasi usaha (PRD FR-1.2)
+                    Anda dapat memiliki hingga 5 cabang aktif.
                   </p>
                 </div>
                 <button
@@ -411,7 +396,7 @@ export default function BranchesPage() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Contoh: Cabang Malioboro"
-                    className="w-full h-10 px-3 border border-slate-300 rounded-xl text-xs font-medium text-slate-900 focus:ring-2 focus:ring-enterprise-500/20 focus:border-enterprise-600 transition-colors"
+                    className="w-full h-10 px-3 border border-slate-300 rounded-xl text-xs font-medium text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-colors"
                   />
                 </div>
 
@@ -426,7 +411,7 @@ export default function BranchesPage() {
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                     placeholder="Contoh: Jl. Malioboro No. 45, Yogyakarta"
-                    className="w-full p-3 border border-slate-300 rounded-xl text-xs text-slate-900 focus:ring-2 focus:ring-enterprise-500/20 focus:border-enterprise-600 transition-colors"
+                    className="w-full p-3 border border-slate-300 rounded-xl text-xs text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-colors"
                   />
                 </div>
 
@@ -441,15 +426,15 @@ export default function BranchesPage() {
                     value={dailyTarget}
                     onChange={(e) => setDailyTarget(e.target.value)}
                     placeholder="Contoh: 3000000"
-                    className="w-full h-10 px-3 border border-slate-300 rounded-xl text-sm font-mono font-bold text-slate-900 focus:ring-2 focus:ring-enterprise-500/20 focus:border-enterprise-600 transition-colors"
+                    className="w-full h-10 px-3 border border-slate-300 rounded-xl text-sm font-mono font-bold text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-colors"
                   />
                   {numericTarget > 0 && (
-                    <p className="text-[11px] text-enterprise-600 font-semibold mt-1">
-                      Terbaca: {formatRupiah(numericTarget)}
+                    <p className="text-[11px] text-brand-700 font-semibold mt-1">
+                      Nilai target: {formatRupiah(numericTarget)}
                     </p>
                   )}
                   <p className="text-[11px] text-slate-400 mt-1">
-                    Dipakai untuk menghitung persentase capaian di Branch Leaderboard
+                    Digunakan untuk menampilkan capaian penjualan cabang.
                   </p>
                 </div>
 
@@ -496,7 +481,7 @@ export default function BranchesPage() {
 
               <div className="p-5 space-y-4">
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Cabang <strong className="text-slate-900">&quot;{deletingBranch.name}&quot;</strong> akan dinonaktifkan dan tidak muncul lagi di kasir POS. Seluruh riwayat transaksi historis tetap tersimpan aman (PRD D9).
+                  Cabang <strong className="text-slate-900">&quot;{deletingBranch.name}&quot;</strong> akan dinonaktifkan dan tidak dapat dipilih untuk transaksi baru. Riwayat transaksi tetap tersimpan.
                 </p>
 
                 <div className="flex items-center justify-end gap-2.5 pt-2">

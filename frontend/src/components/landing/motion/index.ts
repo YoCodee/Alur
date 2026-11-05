@@ -19,7 +19,7 @@ export { SecurityCardDemo } from './security-card';
 
 export { AnomalyTerminalDemo } from './anomaly-terminal';
 
-export { HeroMotion } from './hero-motion';
+export { HeroWorkflowPreview } from './hero-workflow-preview';
 
 export { NetworkRadarMotion } from './network-radar';
 

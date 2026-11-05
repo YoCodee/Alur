@@ -2257,3 +2257,58 @@
 **Verifikasi hidup:** seed ulang via `POST /api/demo/seed` (7,9 dtk, base seed sebelumnya 23 Okt sehingga 7 hari terakhir kosong); setelah seed: laba kemarin Rp 3.408.000 (omzet Rp 8.454.000, +12,7% target harian), performa cabang Malioboro 125% / Bantul 141% / Condongcatur 75%, tren 7 hari terisi, arus kas Rp 38.513.000, margin 62,6%. grep hardcode lama bersih. typecheck/lint ✅ · **168 test lulus**.
 
 **Catatan:** hari berjalan (1 Nov) tampil Rp 0 di grafik karena penjualan belum tercatat hari ini — bukan bug. Test otomatis tidak ditambah: perubahan murni wiring fetch→render di komponen klien; kebenaran angka diverifikasi lewat API PnL yang sudah teruji unit (`auto-ledger`).
+
+## Redesign Warna Riwayat Transaksi (5 Nov 2026)
+
+- `frontend/src/app/(app)/transactions/page.tsx` — aksen biru diganti dengan warna brand oranye untuk badge impor, filter, reset, aksi detail, dan nilai total; aksen sage untuk indikator analitik/QRIS dan spinner loading.
+- Warna status sukses dan VOID tetap memakai hijau dan merah sesuai semantiknya.
+- Verifikasi: `npm run typecheck` lulus; `npm run lint` lulus dengan 1 warning font lama di `src/app/layout.tsx`; `npm test` lulus (19 file, 168 tes).
+
+## Redesign Warna Pengeluaran (5 Nov 2026)
+
+- `frontend/src/app/(app)/expenses/page.tsx` — aksen biru pada filter, fokus input, aksi edit, dan konfirmasi nominal diganti oranye brand; spinner loading memakai sage. Warna status anomali/peringatan tetap merah dan status normal tetap hijau.
+- Verifikasi: `npm run typecheck` lulus; `npm run lint` lulus dengan 1 warning font lama di `src/app/layout.tsx`; `npm test` lulus (19 file, 168 tes).
+
+## Redesign Warna Inventaris (5 Nov 2026)
+
+- `frontend/src/app/(app)/products/page.tsx` dan `frontend/src/app/(app)/stock/page.tsx` — aksen biru pada filter, kategori aktif, badge, dan aksi inventaris diganti dengan brand oranye; spinner loading menjadi sage. Warna status stok dan mutasi yang bermakna (sukses/peringatan/bahaya) dipertahankan.
+- Verifikasi: `npm run typecheck` lulus; `npm run lint` lulus dengan 1 warning font lama di `src/app/layout.tsx`; `npm test` lulus (19 file, 168 tes).
+
+## Penyederhanaan Teks Riwayat Transaksi (5 Nov 2026)
+
+- `frontend/src/app/(app)/transactions/page.tsx` — deskripsi halaman, metrik, filter status, dan rincian nota disederhanakan ke Bahasa Indonesia; istilah berulang/jargon seperti `anti-fraud`, `Basket size`, `COMPLETED`, `Revenue`, dan `Gross Profit` dihapus dari teks yang tampil.
+- Istilah VOID tetap dipertahankan hanya pada konteks status/aksi pembatalan yang relevan.
+- Verifikasi: `npm run typecheck` lulus; `npm run lint` lulus dengan 1 warning font lama di `src/app/layout.tsx`; `npm test` lulus (19 file, 168 tes).
+
+## Redesign Warna Laporan Keuangan (5 Nov 2026)
+
+- `frontend/src/app/(app)/reports/page.tsx` — aksen biru pada kontrol periode, grafik omzet, indikator pembayaran, serta angka margin/kontribusi diganti oranye brand atau sage. Loading spinner memakai sage; warna biaya dan laba/rugi yang menandakan kondisi tetap dipertahankan.
+- Verifikasi: `npm run typecheck` lulus; `npm run lint` lulus dengan 1 warning font lama di `src/app/layout.tsx`; `npm test` lulus (19 file, 168 tes).
+
+## Penyederhanaan UI Ringkasan Laba Rugi (5 Nov 2026)
+
+- `frontend/src/app/(app)/reports/page.tsx` — panel gelap “Value Flow” diubah menjadi kartu putih “Ringkasan Laba Rugi” dengan badge sederhana, hierarki nilai yang lebih jelas, serta penekanan warna oranye/sage/merah yang terukur. Emoji dan kode teknis pembayaran diganti menjadi label “Tunai” dan “QRIS”.
+- Verifikasi: `npm run typecheck` lulus; `npm run lint` lulus dengan 1 warning font lama di `src/app/layout.tsx`; `npm test` lulus (19 file, 168 tes).
+
+## Penyederhanaan Teks Laporan Keuangan (5 Nov 2026)
+
+- `frontend/src/app/(app)/reports/page.tsx` — istilah teknis dan label berulang disederhanakan pada header, metrik, tab, grafik, ringkasan cabang, dan produk. Label cabang konsolidasi diganti menjadi “(Seluruh Cabang)” pada judul laporan; opsi filter menjadi “Semua Cabang”.
+- Verifikasi: `npm run typecheck` lulus; `npm run lint` lulus dengan 1 warning font lama di `src/app/layout.tsx`; `npm test` lulus (19 file, 168 tes).
+
+## Penyegaran Halaman Manajemen Owner (5 Nov 2026)
+
+- Halaman Manajemen, Cabang, Kasir, dan Impor Data diringkas dengan label navigasi yang lebih jelas serta teks nonteknis. Kartu penjelasan keamanan/arsitektur yang berulang pada halaman kasir dihapus.
+- Aksen biru pada formulir, pilihan aktif, dan kontrol impor diganti oranye; spinner impor memakai sage. Status aktif/nonaktif dan pesan sukses/peringatan tetap memakai warna semantik.
+- Verifikasi: `npm run typecheck` lulus; `npm run lint` lulus dengan 1 warning font lama di `src/app/layout.tsx`; `npm test` lulus (19 file, 168 tes).
+
+## Penyederhanaan Teks Halaman Operasional Owner (5 Nov 2026)
+
+- Halaman katalog dan stok memakai “kode produk”/“modal”, mengganti label SKU/HPP, serta menyederhanakan istilah teknis pada pemindahan stok dan riwayat pergerakan. Label transaksi dibatalkan dan pembayaran tunai diringkas tanpa mengubah nilai status internal.
+- Halaman Pengeluaran menghapus pengulangan “beban operasional” dan istilah “jurnal otomatis”; tombol ekspor laporan kini menyebut format sebenarnya, “Ekspor CSV”.
+- Verifikasi: `npm run typecheck` lulus; `npm run lint` lulus dengan 1 warning font lama di `src/app/layout.tsx`; `npm test` lulus (19 file, 168 tes). Tampilan belum diuji langsung di browser.
+
+## Perapian Panduan Demo dan Fitur (5 Nov 2026)
+
+- Halaman Panduan Demo memakai tampilan terang dengan aksen brand oranye/sage, dan penjelasan lima langkah disederhanakan agar lebih mudah diikuti.
+- Panduan tur memakai font global Plus Jakarta Sans; tulisan tombol menjadi “Lanjut” dan “Kembali” tanpa panah. Label navigasi “Panduan Tur Fitur” disingkat menjadi “Panduan Fitur”.
+- Verifikasi: `npm run typecheck` lulus; `npm run lint` lulus dengan 1 warning font lama di `src/app/layout.tsx`; `npm test` lulus (19 file, 168 tes). Tampilan belum diuji langsung di browser.

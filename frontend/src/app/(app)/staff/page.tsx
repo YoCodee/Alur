@@ -3,10 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { RoleGuard } from '@/components/role-guard';
 import {
-  ShieldCheck,
   Store,
   UserCheck,
-  KeyRound,
   UserPlus,
   Search,
   Key,
@@ -278,14 +276,10 @@ export default function StaffPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <div className="flex items-center gap-2.5">
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-                Kelola Akun Staf &amp; Kasir
-              </h1>
-              <Badge variant="enterprise">Khusus Owner</Badge>
-              <Badge variant="brand">Hak Akses Terjaga</Badge>
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900">Kelola Kasir</h1>
             </div>
             <p className="text-sm text-slate-500 mt-0.5">
-              Daftarkan akun kasir cabang baru, tugaskan gerai operasional, dan kelola hak akses Terminal POS
+              Tambah kasir, tentukan cabang, dan atur akses masuk.
             </p>
           </div>
 
@@ -354,36 +348,25 @@ export default function StaffPage() {
 
         {/* 4-KPI Metric Strip */}
         <MetricStrip
-          title="Ringkasan Akun Kasir &amp; Keamanan"
-          action={
-            <span className="text-xs text-slate-500 font-medium">
-              Standar Keamanan: <strong className="text-slate-700">Hak Akses Terproteksi</strong>
-            </span>
-          }
+          title="Ringkasan Kasir"
           metrics={[
             {
-              label: 'Total Kasir Terdaftar',
+              label: 'Jumlah Kasir',
               value: `${totalCount} Kasir`,
-              subtext: 'Akun staf dalam organisasi',
+              subtext: 'Semua akun kasir',
               badge: <Badge variant="enterprise">Total</Badge>,
             },
             {
-              label: 'Kasir Berstatus Aktif',
+              label: 'Kasir Aktif',
               value: `${activeCount} Aktif`,
-              subtext: 'Memiliki izin login ke POS',
+              subtext: 'Dapat masuk dan melayani transaksi',
               badge: <Badge variant="success">Aktif</Badge>,
             },
             {
-              label: 'Cabang Terpetakan',
-              value: `${uniqueBranchesCount} Gerai`,
-              subtext: 'Mendapat alokasi staf kasir',
-              badge: <Badge variant="brand">Outlet</Badge>,
-            },
-            {
-              label: 'Isolasi RLS Database',
-              value: '100% Terkunci',
-              subtext: 'Kasir hanya melihat data cabangnya',
-              badge: <Badge variant="neutral">Anti-Fraud</Badge>,
+              label: 'Cabang dengan Kasir',
+              value: `${uniqueBranchesCount} cabang`,
+              subtext: 'Memiliki setidaknya satu kasir',
+              badge: <Badge variant="brand">Cabang</Badge>,
             },
           ]}
         />
@@ -397,7 +380,7 @@ export default function StaffPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cari nama kasir, email, atau cabang..."
-              className="w-full h-9 pl-9 pr-3 rounded-lg border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-enterprise-600 focus:ring-1 focus:ring-enterprise-500/20"
+              className="w-full h-9 pl-9 pr-3 rounded-lg border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-500/20"
             />
           </div>
 
@@ -407,7 +390,7 @@ export default function StaffPage() {
               aria-label="Filter Cabang"
               value={filterBranch}
               onChange={(e) => setFilterBranch(e.target.value)}
-              className="h-9 px-3 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:border-enterprise-600"
+              className="h-9 px-3 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:border-brand-600"
             >
               <option value="ALL">Semua Cabang ({branches.length})</option>
               {branches.map((b) => (
@@ -422,7 +405,7 @@ export default function StaffPage() {
               aria-label="Filter Status Kasir"
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value as 'ALL' | 'ACTIVE' | 'INACTIVE')}
-              className="h-9 px-3 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:border-enterprise-600"
+              className="h-9 px-3 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:border-brand-600"
             >
               <option value="ALL">Semua Status</option>
               <option value="ACTIVE">Hanya Aktif</option>
@@ -435,21 +418,19 @@ export default function StaffPage() {
         <div className="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden">
           <div className="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
             <div>
-              <h2 className="text-sm font-bold text-slate-900">Daftar Akun Kasir Cabang</h2>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Menampilkan {filteredCashiers.length} akun kasir terdaftar
-              </p>
+              <h2 className="text-sm font-bold text-slate-900">Daftar Kasir</h2>
+              <p className="text-xs text-slate-500 mt-0.5">{filteredCashiers.length} kasir</p>
             </div>
             {branches.filter((b) => b.is_active).length > 0 && (
               <span className="text-xs text-slate-500 hidden sm:inline">
-                {branches.filter((b) => b.is_active).length} Cabang Aktif Tersedia
+                {branches.filter((b) => b.is_active).length} cabang aktif
               </span>
             )}
           </div>
 
           {loading ? (
             <div className="py-16 text-center text-slate-400">
-              <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-enterprise-600" />
+              <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-sage-600" />
               <p className="text-xs">Memuat data staf kasir...</p>
             </div>
           ) : filteredCashiers.length === 0 ? (
@@ -461,7 +442,7 @@ export default function StaffPage() {
               <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1 mb-4">
                 {searchQuery || filterBranch !== 'ALL' || filterStatus !== 'ALL'
                   ? 'Tidak ada akun kasir yang cocok dengan filter pencarian Anda.'
-                  : 'Daftarkan kasir pertama Anda agar staf dapat melayani transaksi di Terminal POS cabang.'}
+                  : 'Tambahkan kasir agar dapat mulai melayani transaksi.'}
               </p>
               <Button
                 variant="primary"
@@ -483,9 +464,8 @@ export default function StaffPage() {
                   <tr>
                     <th className="py-3 px-4">Kasir</th>
                     <th className="py-3 px-4">Cabang Penugasan</th>
-                    <th className="py-3 px-4">Peran</th>
-                    <th className="py-3 px-4">Status Akses</th>
-                    <th className="py-3 px-4">Tgl Terdaftar</th>
+                    <th className="py-3 px-4">Status</th>
+                    <th className="py-3 px-4">Terdaftar</th>
                     <th className="py-3 px-4 text-right">Aksi</th>
                   </tr>
                 </thead>
@@ -495,7 +475,7 @@ export default function StaffPage() {
                       {/* Nama & Email */}
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-full bg-blue-50 text-enterprise-700 border border-blue-200/80 flex items-center justify-center font-bold text-xs uppercase shrink-0">
+                          <div className="w-8 h-8 rounded-full bg-brand-50 text-brand-700 border border-brand-200 flex items-center justify-center font-bold text-xs uppercase shrink-0">
                             {c.full_name.charAt(0)}
                           </div>
                           <div className="min-w-0">
@@ -522,11 +502,6 @@ export default function StaffPage() {
                         ) : (
                           <span className="text-slate-400 italic">Belum ditentukan</span>
                         )}
-                      </td>
-
-                      {/* Role */}
-                      <td className="py-3.5 px-4">
-                        <Badge variant="enterprise">Kasir POS</Badge>
                       </td>
 
                       {/* Status */}
@@ -600,99 +575,6 @@ export default function StaffPage() {
           )}
         </div>
 
-        {/* Security & Role Architecture Cards (Tetap dipertahankan untuk referensi juri) */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {/* Card 1: Role Cashier */}
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-card space-y-4">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 text-enterprise-600 flex items-center justify-center">
-              <UserCheck className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="text-base font-bold text-slate-900">Peran Kasir (CASHIER)</h3>
-                <Badge variant="enterprise">Operasional</Badge>
-              </div>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Kasir memiliki akses langsung ke Terminal POS untuk melayani transaksi belanja pelanggan, cetak struk thermal, dan melihat katalog menu cabang tugasnya.
-              </p>
-            </div>
-            <ul className="text-xs text-slate-600 space-y-2 pt-2 border-t border-slate-100">
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                <span>Input pesanan via sentuh &amp; pencarian cepat</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                <span>Simulasi pembayaran Tunai &amp; QRIS</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
-                <span className="text-slate-400">Dibatasi: Tidak dapat melihat Laba Rugi owner</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Card 2: Row Level Security */}
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-card space-y-4">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="text-base font-bold text-slate-900">Pemisahan Data Antarcabang</h3>
-                <Badge variant="success">Otomatis</Badge>
-              </div>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Data tiap gerai terisolasi dengan aman. Kasir hanya dapat melihat stok dan transaksi di cabangnya sendiri tanpa bisa mengakses cabang lain.
-              </p>
-            </div>
-            <ul className="text-xs text-slate-600 space-y-2 pt-2 border-t border-slate-100">
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                <span>Isolasi ketat antar cabang multi-outlet</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                <span>Pencegahan kebocoran data rahasia cabang</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                <span>Perlindungan data otomatis di tingkat sistem</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Card 3: Role Owner */}
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-card space-y-4">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 text-enterprise-600 flex items-center justify-center">
-              <KeyRound className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="text-base font-bold text-slate-900">Peran Pemilik (OWNER)</h3>
-                <Badge variant="brand">Akses Penuh</Badge>
-              </div>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Pemilik bisnis memiliki hak konsolidasi penuh: memantau 3 Pertanyaan Pagi, mengeksekusi transfer mutasi stok cerdas antarcabang, audit VOID kasir, dan ekspor P&amp;L bank KUR.
-              </p>
-            </div>
-            <ul className="text-xs text-slate-600 space-y-2 pt-2 border-t border-slate-100">
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-enterprise-500" />
-                <span>Konsolidasi finansial 5 cabang real-time</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-enterprise-500" />
-                <span>Otorisasi pembatalan nota (VOID) anti-fraud</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-enterprise-500" />
-                <span>Ekspor dokumen KUR bank (PDF &amp; Excel)</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
         {/* ======================================================== */}
         {/* MODAL TAMBAH KASIR BARU */}
         {/* ======================================================== */}
@@ -701,13 +583,13 @@ export default function StaffPage() {
             <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150">
               <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-slate-900">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-enterprise-600 text-white flex items-center justify-center shadow-xs">
+                  <div className="w-8 h-8 rounded-lg bg-brand-500 text-white flex items-center justify-center shadow-xs">
                     <UserPlus className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold">Tambah Akun Kasir Baru</h3>
+                    <h3 className="text-sm font-bold">Tambah Kasir</h3>
                     <p className="text-[11px] text-slate-500">
-                      Kasir akan otomatis dibuatkan akun login dan diikat ke cabang
+                      Akun kasir dibuat untuk cabang yang dipilih.
                     </p>
                   </div>
                 </div>
@@ -731,7 +613,7 @@ export default function StaffPage() {
                     value={addName}
                     onChange={(e) => setAddName(e.target.value)}
                     placeholder="Contoh: Siti Barista"
-                    className="w-full h-9 px-3 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:border-enterprise-600 focus:ring-1 focus:ring-enterprise-500/20"
+                    className="w-full h-9 px-3 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-500/20"
                   />
                 </div>
 
@@ -745,10 +627,10 @@ export default function StaffPage() {
                     value={addEmail}
                     onChange={(e) => setAddEmail(e.target.value)}
                     placeholder="Contoh: siti.kasir@kopi.id"
-                    className="w-full h-9 px-3 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:border-enterprise-600 focus:ring-1 focus:ring-enterprise-500/20"
+                    className="w-full h-9 px-3 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-500/20"
                   />
                   <p className="text-[10px] text-slate-400 mt-1">
-                    Digunakan kasir untuk masuk di halaman login terminal
+                    Digunakan kasir untuk masuk ke aplikasi.
                   </p>
                 </div>
 
@@ -763,7 +645,7 @@ export default function StaffPage() {
                     value={addPassword}
                     onChange={(e) => setAddPassword(e.target.value)}
                     placeholder="Minimal 6 karakter (cth: Kasir123!)"
-                    className="w-full h-9 px-3 border border-slate-300 rounded-lg text-xs text-slate-900 font-mono focus:outline-none focus:border-enterprise-600 focus:ring-1 focus:ring-enterprise-500/20"
+                    className="w-full h-9 px-3 border border-slate-300 rounded-lg text-xs text-slate-900 font-mono focus:outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-500/20"
                   />
                 </div>
 
@@ -776,7 +658,7 @@ export default function StaffPage() {
                     aria-label="Pilih cabang penugasan kasir"
                     value={addBranchId}
                     onChange={(e) => setAddBranchId(e.target.value)}
-                    className="w-full h-9 px-3 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:border-enterprise-600"
+                    className="w-full h-9 px-3 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:border-brand-600"
                   >
                     {branches.filter((b) => b.is_active).length === 0 ? (
                       <option value="" disabled>
@@ -793,7 +675,7 @@ export default function StaffPage() {
                     )}
                   </select>
                   <p className="text-[10px] text-slate-400 mt-1">
-                    Kasir ini hanya bisa bertransaksi dan melihat stok pada cabang ini (RLS diaktifkan).
+                    Kasir hanya dapat bertransaksi dan melihat stok di cabang ini.
                   </p>
                 </div>
 
@@ -831,7 +713,7 @@ export default function StaffPage() {
             <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150">
               <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-slate-900">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-enterprise-700 flex items-center justify-center border border-blue-200">
+                  <div className="w-8 h-8 rounded-lg bg-brand-50 text-brand-700 flex items-center justify-center border border-brand-200">
                     <Edit2 className="w-4 h-4" />
                   </div>
                   <div>
@@ -858,7 +740,7 @@ export default function StaffPage() {
                     required
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
-                    className="w-full h-9 px-3 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:border-enterprise-600"
+                    className="w-full h-9 px-3 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:border-brand-600"
                   />
                 </div>
 
@@ -871,7 +753,7 @@ export default function StaffPage() {
                     aria-label="Pilih cabang rotasi kasir"
                     value={editBranchId}
                     onChange={(e) => setEditBranchId(e.target.value)}
-                    className="w-full h-9 px-3 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:border-enterprise-600"
+                    className="w-full h-9 px-3 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:border-brand-600"
                   >
                     {branches
                       .filter((b) => b.is_active)
@@ -892,7 +774,7 @@ export default function StaffPage() {
                       onChange={(e) => setEditActive(e.target.checked)}
                       className="sr-only peer"
                     />
-                    <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-enterprise-600 relative"></div>
+                    <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-500 relative"></div>
                     <span className="ml-2 text-xs font-medium text-slate-700">
                       {editActive ? 'Aktif' : 'Nonaktif'}
                     </span>
@@ -962,7 +844,7 @@ export default function StaffPage() {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Masukkan sandi baru (min. 6 karakter)"
-                    className="w-full h-9 px-3 border border-slate-300 rounded-lg text-xs text-slate-900 font-mono focus:outline-none focus:border-enterprise-600"
+                    className="w-full h-9 px-3 border border-slate-300 rounded-lg text-xs text-slate-900 font-mono focus:outline-none focus:border-brand-600"
                   />
                   <p className="text-[10px] text-slate-400 mt-1">
                     Kasir dapat langsung login dengan kata sandi baru ini.

@@ -204,7 +204,7 @@ export default function TransactionsPage() {
     if (!voidingTx) return;
 
     if (!voidReason.trim() || voidReason.trim().length < 3) {
-      alert('Alasan void minimal 3 karakter.');
+      alert('Alasan pembatalan minimal 3 karakter.');
       return;
     }
 
@@ -221,7 +221,7 @@ export default function TransactionsPage() {
         throw new Error(json.error?.message || 'Gagal membatalkan transaksi.');
       }
 
-      alert('Transaksi berhasil di-void dan stok telah dikembalikan ke cabang.');
+      alert('Transaksi berhasil dibatalkan dan stok telah dikembalikan ke cabang.');
       setVoidingTx(null);
       setVoidReason('');
       if (selectedTx?.id === voidingTx.id) {
@@ -242,8 +242,8 @@ export default function TransactionsPage() {
     switch (method) {
       case 'IMPORT':
         return (
-          <span className="inline-flex items-center gap-1 text-[10px] font-medium text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">
-            <FileSpreadsheet className="w-3 h-3 text-blue-600" /> Import
+          <span className="inline-flex items-center gap-1 text-[10px] font-medium text-brand-700 bg-brand-50 px-2 py-0.5 rounded-md border border-brand-200">
+            <FileSpreadsheet className="w-3 h-3 text-brand-600" /> Import
           </span>
         );
       case 'DEMO':
@@ -263,7 +263,7 @@ export default function TransactionsPage() {
 
   const metricStripItems: MetricItem[] = [
     {
-      label: 'Omzet Halaman Ini (Selesai)',
+      label: 'Omzet Transaksi Selesai',
       value: formatRupiah(summaryMetrics.completedRevenue),
       subtext: `${summaryMetrics.completedCount} transaksi sukses tercatat`,
       badge: (
@@ -273,22 +273,22 @@ export default function TransactionsPage() {
       ),
     },
     {
-      label: 'Kas Tunai di Register',
+      label: 'Pembayaran Tunai',
       value: formatRupiah(summaryMetrics.cashRevenue),
-      subtext: 'Pembayaran cash wajib ada di laci',
+      subtext: 'Pembayaran tunai wajib ada di laci',
       badge: (
         <Badge variant="neutral" dot>
-          Uang Fisik
+          Tunai
         </Badge>
       ),
     },
     {
-      label: 'Transaksi Dibatalkan (VOID)',
+      label: 'Transaksi Dibatalkan',
       value: `${summaryMetrics.voidCount} Nota`,
       subtext: summaryMetrics.voidCount > 0 ? 'Stok otomatis dikembalikan' : 'Nihil pembatalan',
       badge: (
         <Badge variant={summaryMetrics.voidCount > 0 ? 'danger' : 'neutral'} dot>
-          {summaryMetrics.voidCount > 0 ? 'Perlu Audit' : 'Nihil'}
+          {summaryMetrics.voidCount > 0 ? 'Perlu Ditinjau' : 'Nihil'}
         </Badge>
       ),
     },
@@ -299,9 +299,9 @@ export default function TransactionsPage() {
           ? Math.round(summaryMetrics.completedRevenue / summaryMetrics.completedCount)
           : 0
       ),
-      subtext: 'Basket size per transaksi',
+       subtext: 'Rata-rata nilai transaksi',
       badge: (
-        <Badge variant="enterprise" dot>
+              <Badge variant="enterprise" dot className="!bg-sage-50 !text-sage-700">
           Rata-rata
         </Badge>
       ),
@@ -318,11 +318,11 @@ export default function TransactionsPage() {
               Riwayat Transaksi Penjualan
             </h1>
             <Badge variant="neutral" className="font-mono">
-              {totalCount} Total Nota
+              {totalCount} Transaksi
             </Badge>
           </div>
           <p className="text-xs sm:text-sm text-slate-500">
-            Audit nota kasir, rincian pembayaran QRIS & Tunai, serta penanganan pembatalan transaksi (VOID) dengan log anti-fraud.
+            Lihat transaksi, rincian pembayaran QRIS dan tunai, serta kelola pembatalan transaksi.
           </p>
         </div>
 
@@ -334,7 +334,7 @@ export default function TransactionsPage() {
             disabled={loading}
             className="gap-1.5"
           >
-            <RotateCcw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-enterprise-600' : ''}`} />
+            <RotateCcw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-sage-600' : ''}`} />
             <span>Segarkan</span>
           </Button>
         </div>
@@ -342,7 +342,7 @@ export default function TransactionsPage() {
 
       {/* Summary KPI Strip (Pola refrence1 (4).png) */}
       <MetricStrip
-        title="Ringkasan Transaksi Penjualan (Halaman Terpilih)"
+        title="Ringkasan Transaksi"
         metrics={metricStripItems}
       />
 
@@ -350,7 +350,7 @@ export default function TransactionsPage() {
       <div className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-xs space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs font-bold text-slate-700 uppercase tracking-wider">
-            <Filter className="w-3.5 h-3.5 text-enterprise-600" />
+            <Filter className="w-3.5 h-3.5 text-brand-600" />
             <span>Filter Data Transaksi</span>
           </div>
 
@@ -367,9 +367,9 @@ export default function TransactionsPage() {
                 setSelectedPayment('ALL');
                 setPage(1);
               }}
-              className="text-xs text-enterprise-600 hover:text-enterprise-700 font-bold cursor-pointer"
+              className="text-xs text-brand-600 hover:text-brand-700 font-bold cursor-pointer"
             >
-              Reset ke Default (Hari Ini)
+              Reset Filter
             </button>
           )}
         </div>
@@ -387,7 +387,7 @@ export default function TransactionsPage() {
                   setSelectedBranchId(e.target.value);
                   handleFilterChange();
                 }}
-                className="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-enterprise-500 cursor-pointer"
+                className="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-brand-500 cursor-pointer"
               >
                 <option value="ALL">Semua Cabang</option>
                 {branches.map((b) => (
@@ -412,7 +412,7 @@ export default function TransactionsPage() {
                   setSelectedDate(e.target.value);
                   handleFilterChange();
                 }}
-                className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-enterprise-500 cursor-pointer"
+                className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-brand-500 cursor-pointer"
               />
             </div>
           </div>
@@ -427,10 +427,10 @@ export default function TransactionsPage() {
                 setSelectedPayment(e.target.value);
                 handleFilterChange();
               }}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-enterprise-500 cursor-pointer"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-brand-500 cursor-pointer"
             >
               <option value="ALL">Semua Metode Pembayaran</option>
-              <option value="CASH">Tunai (CASH)</option>
+              <option value="CASH">Tunai</option>
               <option value="QRIS_SIM">QRIS Simulasi</option>
             </select>
           </div>
@@ -445,11 +445,11 @@ export default function TransactionsPage() {
                 setSelectedStatus(e.target.value);
                 handleFilterChange();
               }}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-enterprise-500 cursor-pointer"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-brand-500 cursor-pointer"
             >
               <option value="ALL">Semua Status Nota</option>
-              <option value="COMPLETED">Selesai (COMPLETED)</option>
-              <option value="VOID">Dibatalkan (VOID)</option>
+              <option value="COMPLETED">Selesai</option>
+              <option value="VOID">Dibatalkan</option>
             </select>
           </div>
         </div>
@@ -476,8 +476,8 @@ export default function TransactionsPage() {
       <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
         {loading ? (
           <div className="py-24 flex flex-col items-center justify-center text-slate-400">
-            <Loader2 className="w-8 h-8 animate-spin text-enterprise-600 mb-2" />
-            <p className="text-xs font-medium text-slate-600">Memuat data mutasi transaksi...</p>
+            <Loader2 className="w-8 h-8 animate-spin text-sage-600 mb-2" />
+            <p className="text-xs font-medium text-slate-600">Memuat riwayat transaksi...</p>
           </div>
         ) : transactions.length === 0 ? (
           <EmptyState
@@ -528,7 +528,7 @@ export default function TransactionsPage() {
                             </>
                           ) : (
                             <>
-                              <CreditCard className="w-3.5 h-3.5 text-enterprise-600" /> QRIS
+                              <CreditCard className="w-3.5 h-3.5 text-sage-600" /> QRIS
                             </>
                           )}
                         </span>
@@ -543,7 +543,7 @@ export default function TransactionsPage() {
                       <td className="py-3.5 px-4 text-center">
                         {isVoid ? (
                           <Badge variant="danger" dot>
-                            VOID
+                            DIBATALKAN
                           </Badge>
                         ) : (
                           <Badge variant="success" dot>
@@ -556,7 +556,7 @@ export default function TransactionsPage() {
                           <button
                             type="button"
                             onClick={() => setSelectedTx(tx)}
-                            className="p-1.5 text-enterprise-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
+                            className="p-1.5 text-brand-600 hover:bg-brand-50 rounded-lg transition-colors cursor-pointer"
                             title="Lihat Detail Nota"
                           >
                             <Eye className="w-4 h-4" />
@@ -569,7 +569,7 @@ export default function TransactionsPage() {
                                 setVoidReason('');
                               }}
                               className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
-                              title="Void Transaksi"
+                              title="Batalkan Transaksi"
                             >
                               <Ban className="w-4 h-4" />
                             </button>
@@ -652,12 +652,12 @@ export default function TransactionsPage() {
                 <div className="bg-rose-50 border border-rose-200 p-3.5 rounded-xl text-xs text-rose-800 space-y-1">
                   <div className="font-bold flex items-center gap-1.5">
                     <Ban className="w-4 h-4 text-rose-600" />
-                    <span>Transaksi Dibatalkan (VOID)</span>
+                    <span>Transaksi Dibatalkan</span>
                   </div>
                   <p className="pt-0.5">Alasan: {selectedTx.void_reason || '-'}</p>
                   {selectedTx.voided_at && (
                     <p className="text-[10px] text-rose-600 font-mono">
-                      Waktu Void: {formatDateId(selectedTx.voided_at, 'd MMM yyyy, HH:mm')} WIB
+                      Waktu Pembatalan: {formatDateId(selectedTx.voided_at, 'd MMM yyyy, HH:mm')} WIB
                     </p>
                   )}
                 </div>
@@ -680,7 +680,7 @@ export default function TransactionsPage() {
                 <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
                   <span className="text-slate-500 block text-[11px]">Metode Pembayaran</span>
                   <span className="font-bold text-slate-800">
-                    {selectedTx.payment_method === 'CASH' ? 'Tunai (CASH)' : 'QRIS Simulasi'}
+                    {selectedTx.payment_method === 'CASH' ? 'Tunai' : 'QRIS Simulasi'}
                   </span>
                 </div>
                 <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
@@ -729,19 +729,19 @@ export default function TransactionsPage() {
               {/* Financial Breakdown */}
               <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-1.5 text-xs">
                 <div className="flex justify-between text-slate-700 font-bold text-sm">
-                  <span>Total Tagihan (Revenue)</span>
-                  <span className="text-enterprise-600 font-mono">
+                  <span>Total Tagihan</span>
+                  <span className="text-brand-600 font-mono">
                     {formatRupiah(selectedTx.total_revenue)}
                   </span>
                 </div>
                 {currentUserRole === 'OWNER' && (
                   <>
                     <div className="flex justify-between text-slate-500 pt-1.5 border-t border-slate-200">
-                      <span>Total HPP (Modal Pokok)</span>
+                      <span>Modal Barang</span>
                       <span className="font-mono">{formatRupiah(selectedTx.total_cogs)}</span>
                     </div>
                     <div className="flex justify-between text-emerald-700 font-bold">
-                      <span>Gross Profit (Laba Kotor)</span>
+                       <span>Laba Kotor</span>
                       <span className="font-mono">{formatRupiah(selectedTx.gross_profit)}</span>
                     </div>
                   </>
@@ -773,7 +773,7 @@ export default function TransactionsPage() {
                     className="gap-1.5"
                   >
                     <Ban className="w-3.5 h-3.5" />
-                    <span>Void Transaksi</span>
+                    <span>Batalkan Transaksi</span>
                   </Button>
                 )}
                 <Button
@@ -790,7 +790,7 @@ export default function TransactionsPage() {
       )}
 
       {/* ======================================================== */}
-      {/* VOID CONFIRMATION MODAL (Anti-Fraud Reason Required) */}
+      {/* Transaction cancellation confirmation modal */}
       {/* ======================================================== */}
       {voidingTx && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
@@ -800,7 +800,7 @@ export default function TransactionsPage() {
                 <Ban className="w-4 h-4 text-rose-600" />
               </div>
               <div>
-                <h3 className="text-sm font-bold">Batalkan Transaksi (VOID)</h3>
+                <h3 className="text-sm font-bold">Batalkan Transaksi</h3>
                 <p className="text-[11px] text-rose-600 font-mono">
                   #{voidingTx.id.slice(0, 8)}
                 </p>
@@ -819,7 +819,7 @@ export default function TransactionsPage() {
 
               <div className="space-y-1">
                 <label className="block text-xs font-semibold text-slate-700">
-                  Alasan Pembatalan / Void <span className="text-rose-500">*</span>
+                  Alasan Pembatalan <span className="text-rose-500">*</span>
                 </label>
                 <textarea
                   required
@@ -856,7 +856,7 @@ export default function TransactionsPage() {
                   ) : (
                     <>
                       <Ban className="w-3.5 h-3.5" />
-                      <span>Konfirmasi VOID</span>
+                      <span>Konfirmasi Pembatalan</span>
                     </>
                   )}
                 </Button>

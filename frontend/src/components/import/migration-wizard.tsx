@@ -183,7 +183,7 @@ export function MigrationWizard() {
           body: JSON.stringify({ branch_id: branchId, file_name: fileName, rows: chunk }),
         });
         const json = await res.json();
-        if (!res.ok) throw new Error(json.error?.message || 'Gagal mengimpor batch.');
+        if (!res.ok) throw new Error(json.error?.message || 'Data gagal disimpan.');
         created += Number(json.data.created ?? json.data.inserted ?? 0);
         updated += Number(json.data.updated ?? 0);
         setProgressDone((done) => done + 1);
@@ -223,7 +223,7 @@ export function MigrationWizard() {
     <div className="space-y-4">
       {/* Stepper */}
       <div className="flex items-center gap-2 flex-wrap">
-        {(['Pilih data', 'Unggah & pratinjau', 'Hasil migrasi'] as const).map((label, i) => {
+      {(['Pilih data', 'Periksa file', 'Hasil impor'] as const).map((label, i) => {
           const stepNumber = (i + 1) as 1 | 2 | 3;
           const active = step === stepNumber;
           const passed = step > stepNumber;
@@ -234,7 +234,7 @@ export function MigrationWizard() {
                   passed
                     ? 'bg-emerald-100 text-emerald-700'
                     : active
-                    ? 'bg-enterprise-600 text-white'
+                    ? 'bg-brand-500 text-white'
                     : 'bg-slate-100 text-slate-400'
                 }`}
               >
@@ -263,10 +263,10 @@ export function MigrationWizard() {
                   type="button"
                   onClick={() => { setDataType(key); setParsed(null); }}
                   className={`text-left rounded-xl border p-3.5 transition-colors ${
-                    active ? 'border-enterprise-600 bg-enterprise-50' : 'border-slate-200 bg-white hover:border-slate-300'
+                    active ? 'border-brand-500 bg-brand-50' : 'border-slate-200 bg-white hover:border-slate-300'
                   }`}
                 >
-                  <Icon className={`h-4 w-4 mb-1.5 ${active ? 'text-enterprise-700' : 'text-slate-400'}`} />
+                  <Icon className={`h-4 w-4 mb-1.5 ${active ? 'text-brand-700' : 'text-slate-400'}`} />
                   <p className="text-xs font-bold text-slate-900">{meta.label}</p>
                   <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">{meta.desc}</p>
                 </button>
@@ -276,7 +276,7 @@ export function MigrationWizard() {
 
           <div className="flex flex-col sm:flex-row gap-3 sm:items-end">
             <div className="flex-1">
-              <label className="text-[11px] font-semibold text-slate-500 block mb-1">Cabang tujuan data</label>
+              <label className="text-[11px] font-semibold text-slate-500 block mb-1">Cabang</label>
               <select
                 value={branchId}
                 onChange={(e) => setBranchId(e.target.value)}
@@ -294,13 +294,13 @@ export function MigrationWizard() {
           </div>
 
           <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 text-[11px] text-slate-600 leading-relaxed">
-            <p className="font-semibold text-slate-700 mb-1.5">Kolom & nilai yang bisa diisi</p>
+            <p className="font-semibold text-slate-700 mb-1.5">Panduan kolom file</p>
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="text-slate-500">
                     <th className="pb-1 pr-3 font-semibold">Kolom</th>
-                    <th className="pb-1 pr-3 font-semibold">Isi</th>
+                    <th className="pb-1 pr-3 font-semibold">Contoh isi</th>
                     <th className="pb-1 font-semibold">Wajib</th>
                   </tr>
                 </thead>
@@ -333,10 +333,10 @@ export function MigrationWizard() {
               </table>
             </div>
             <ul className="list-disc pl-4 space-y-0.5 mt-2">
-              <li>Header kolom boleh memakai istilah Anda (mis. &ldquo;Harga Jual&rdquo;, &ldquo;Stok&rdquo;) — dideteksi otomatis.</li>
+              <li>Nama kolom umum seperti &ldquo;Harga Jual&rdquo; dan &ldquo;Stok&rdquo; akan dikenali otomatis.</li>
               <li>Uang boleh memakai titik ribuan (&ldquo;Rp 12.500&rdquo;). Tanggal: 2026-01-31 atau 31/01/2026.</li>
               {dataType === 'PRODUCTS' && <li><strong>Stok awal</strong> hanya berlaku untuk produk baru; stok produk yang sudah ada tidak diubah (gunakan Opname Stok).</li>}
-              {dataType === 'SALES' && <li>SKU harus sudah ada di katalog cabang yang dipilih. Stok historis tidak dipotong.</li>}
+              {dataType === 'SALES' && <li>Kode produk harus sudah ada di katalog cabang. Penjualan lama tidak mengubah stok.</li>}
             </ul>
           </div>
 
@@ -352,13 +352,13 @@ export function MigrationWizard() {
       {step === 2 && (
         <div className="space-y-4">
           <div className="rounded-xl border border-dashed border-slate-300 bg-white p-6 text-center shadow-card space-y-3">
-            <UploadCloud className="w-10 h-10 mx-auto text-enterprise-600" />
+            <UploadCloud className="w-10 h-10 mx-auto text-brand-600" />
             <div>
               <p className="text-sm font-bold text-slate-900">
                 Unggah file {TYPE_META[dataType].label.toLowerCase()}
               </p>
               <p className="text-xs text-slate-500 mt-0.5">
-                CSV atau Excel (.xlsx), maksimal 500 baris per unggahan — file lebih besar dipecah otomatis.
+                Pilih file CSV atau Excel (.xlsx). File besar akan diproses bertahap.
               </p>
             </div>
             <input
@@ -392,13 +392,13 @@ export function MigrationWizard() {
                   <p className="text-slate-500 mt-0.5">
                     <span className="font-semibold text-emerald-700">{validRows.length} baris siap impor</span>
                     {invalidRows.length > 0 && (
-                      <span className="text-rose-600 font-semibold"> · {invalidRows.length} baris error</span>
+                    <span className="text-rose-600 font-semibold"> · {invalidRows.length} baris bermasalah</span>
                     )}
                   </p>
                 </div>
                 {invalidRows.length > 0 && (
                   <Button variant="secondary" size="sm" onClick={downloadErrorCsv} className="h-8 text-[11px] flex items-center gap-1.5">
-                    <Download className="w-3.5 h-3.5" /> Unduh Baris Gagal
+                    <Download className="w-3.5 h-3.5" /> Unduh Baris Bermasalah
                   </Button>
                 )}
               </div>
@@ -413,7 +413,7 @@ export function MigrationWizard() {
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {parsed.rows.slice(0, 50).map((row) => {
-                      const rowErrors = [...row.errors, ...(unknownSkuLines.has(row.line) ? ['SKU tidak ada di katalog cabang ini'] : [])];
+                      const rowErrors = [...row.errors, ...(unknownSkuLines.has(row.line) ? ['Kode produk tidak ada di katalog cabang ini'] : [])];
                       return (
                         <tr key={row.line}>
                           <td className="py-1.5 px-3 font-mono text-slate-400">{row.line}</td>
@@ -459,10 +459,10 @@ export function MigrationWizard() {
         <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-card space-y-3 text-center">
           {committing ? (
             <>
-              <Loader2 className="w-8 h-8 animate-spin text-enterprise-600 mx-auto" />
+              <Loader2 className="w-8 h-8 animate-spin text-sage-600 mx-auto" />
               <p className="text-sm font-bold text-slate-900">Mengimpor data...</p>
               <p className="text-xs text-slate-500">
-                Batch {progressDone} dari {progressTotal}
+                Bagian {progressDone} dari {progressTotal}
               </p>
               <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                 <div

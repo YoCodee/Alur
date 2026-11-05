@@ -387,9 +387,8 @@ export default function ExpensesPage() {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-              Pengeluaran &amp; Beban Operasional
+              Pengeluaran
             </h1>
-            <Badge variant="neutral">Auto-Ledger</Badge>
           </div>
           <p className="text-sm text-slate-500 mt-0.5">
             Pencatatan biaya operasional harian cabang dan deteksi biaya tidak wajar
@@ -410,7 +409,7 @@ export default function ExpensesPage() {
 
       {/* 4-KPI Metric Strip */}
       <MetricStrip
-        title="Ringkasan Beban Operasional"
+        title="Ringkasan Pengeluaran"
         action={
           <span className="text-xs text-slate-500 font-medium">
             Periode: <span className="font-semibold text-slate-700 font-mono">{selectedMonth}</span>
@@ -418,12 +417,12 @@ export default function ExpensesPage() {
         }
         metrics={[
           {
-            label: 'Total Beban Bulan Ini',
+            label: 'Total Pengeluaran Bulan Ini',
             value: formatRupiah(summaryMetrics.totalAmount),
             subtext: `${summaryMetrics.count} transaksi operasional`,
             badge: (
               <Badge variant="brand" dot>
-                Beban
+                Pengeluaran
               </Badge>
             ),
           },
@@ -467,9 +466,9 @@ export default function ExpensesPage() {
       <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-card">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
           <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-enterprise-600" />
+             <Filter className="h-4 w-4 text-brand-600" />
             <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
-              Filter Beban Operasional
+              Filter Pengeluaran
             </span>
             {isFilterActive && (
               <Badge variant="brand" className="text-[10px]">
@@ -506,10 +505,10 @@ export default function ExpensesPage() {
                 disabled={currentUserRole !== 'OWNER'}
                 value={selectedBranchId}
                 onChange={(e) => setSelectedBranchId(e.target.value)}
-                className="w-full h-9 pl-9 pr-8 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-900 focus:bg-white focus:border-enterprise-500 focus:ring-2 focus:ring-enterprise-500/20 disabled:opacity-60 transition-colors cursor-pointer"
+                 className="w-full h-9 pl-9 pr-8 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-900 focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 disabled:opacity-60 transition-colors cursor-pointer"
               >
                 {currentUserRole === 'OWNER' && (
-                  <option value="ALL">Semua Cabang (Konsolidasi)</option>
+                  <option value="ALL">Semua Cabang</option>
                 )}
                 {branches.map((b) => (
                   <option key={b.id} value={b.id}>
@@ -532,7 +531,7 @@ export default function ExpensesPage() {
                 type="month"
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(e.target.value)}
-                className="w-full h-9 pl-9 pr-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-900 focus:bg-white focus:border-enterprise-500 focus:ring-2 focus:ring-enterprise-500/20 transition-colors"
+                 className="w-full h-9 pl-9 pr-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-900 focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-colors"
               />
             </div>
           </div>
@@ -548,7 +547,7 @@ export default function ExpensesPage() {
                 aria-label="Pilih kategori biaya"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full h-9 pl-9 pr-8 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-900 focus:bg-white focus:border-enterprise-500 focus:ring-2 focus:ring-enterprise-500/20 transition-colors cursor-pointer"
+                 className="w-full h-9 pl-9 pr-8 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-900 focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-colors cursor-pointer"
               >
                 <option value="ALL">Semua Kategori</option>
                 {EXPENSE_CATEGORIES.map((cat) => (
@@ -583,7 +582,7 @@ export default function ExpensesPage() {
       <div className="rounded-xl border border-slate-200 bg-white shadow-card overflow-hidden">
         {loading ? (
           <div className="py-20 flex flex-col items-center justify-center text-slate-400">
-            <Loader2 className="w-8 h-8 animate-spin text-enterprise-600 mb-2" />
+             <Loader2 className="w-8 h-8 animate-spin text-sage-600 mb-2" />
             <p className="text-sm font-medium text-slate-600">Memuat data pengeluaran...</p>
           </div>
         ) : expenses.length === 0 ? (
@@ -591,7 +590,7 @@ export default function ExpensesPage() {
             <EmptyState
               icon={Wallet}
               title="Tidak ada pengeluaran pada periode ini"
-              description="Belum ada transaksi beban operasional yang dicatat untuk filter saat ini. Gunakan tombol 'Catat Pengeluaran' untuk menambah pengeluaran."
+              description="Belum ada pengeluaran untuk filter ini. Gunakan tombol 'Catat Pengeluaran' untuk menambahkan data."
               actionLabel="Catat Pengeluaran Baru"
               onAction={handleOpenAdd}
             />
@@ -653,7 +652,7 @@ export default function ExpensesPage() {
                           size="sm"
                           onClick={() => handleOpenEdit(exp)}
                           title="Edit Pengeluaran"
-                          className="h-7 w-7 p-0 text-slate-500 hover:text-enterprise-600 hover:bg-slate-100"
+                           className="h-7 w-7 p-0 text-slate-500 hover:text-brand-600 hover:bg-brand-50"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
                         </Button>
@@ -686,7 +685,7 @@ export default function ExpensesPage() {
                   {editingExpense ? 'Edit Pengeluaran' : 'Catat Pengeluaran Baru'}
                 </h3>
                 <p className="text-xs text-slate-500">
-                  Rincian biaya operasional untuk jurnal otomatis
+                  Isi rincian biaya operasional.
                 </p>
               </div>
               <button
@@ -709,7 +708,7 @@ export default function ExpensesPage() {
                   disabled={!!editingExpense || currentUserRole !== 'OWNER'}
                   value={formBranchId}
                   onChange={(e) => setFormBranchId(e.target.value)}
-                  className="w-full h-10 px-3 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-900 focus:ring-2 focus:ring-enterprise-500/20 focus:border-enterprise-600 disabled:bg-slate-100 transition-colors"
+                   className="w-full h-10 px-3 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 disabled:bg-slate-100 transition-colors"
                 >
                   {branches.map((b) => (
                     <option key={b.id} value={b.id}>
@@ -730,7 +729,7 @@ export default function ExpensesPage() {
                   required
                   value={formDate}
                   onChange={(e) => setFormDate(e.target.value)}
-                  className="w-full h-10 px-3 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-900 focus:ring-2 focus:ring-enterprise-500/20 focus:border-enterprise-600 transition-colors"
+                   className="w-full h-10 px-3 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-colors"
                 />
               </div>
 
@@ -743,7 +742,7 @@ export default function ExpensesPage() {
                   aria-label="Pilih kategori pengeluaran"
                   value={formCategory}
                   onChange={(e) => setFormCategory(e.target.value as ExpenseCategory)}
-                  className="w-full h-10 px-3 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-900 focus:ring-2 focus:ring-enterprise-500/20 focus:border-enterprise-600 transition-colors"
+                   className="w-full h-10 px-3 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-colors"
                 >
                   {EXPENSE_CATEGORIES.map((cat) => (
                     <option key={cat} value={cat}>
@@ -765,7 +764,7 @@ export default function ExpensesPage() {
                   value={formDescription}
                   onChange={(e) => setFormDescription(e.target.value)}
                   placeholder="Contoh: Beli token listrik PLN, Beli gula & susu..."
-                  className="w-full h-10 px-3 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:ring-2 focus:ring-enterprise-500/20 focus:border-enterprise-600 transition-colors"
+                   className="w-full h-10 px-3 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-colors"
                 />
               </div>
 
@@ -784,10 +783,10 @@ export default function ExpensesPage() {
                     setFormAmount(e.target.value === '' ? '' : parseInt(e.target.value, 10))
                   }
                   placeholder="50000"
-                  className="w-full h-10 px-3 bg-white border border-slate-300 rounded-xl text-sm font-bold text-slate-900 focus:ring-2 focus:ring-enterprise-500/20 focus:border-enterprise-600 transition-colors"
+                   className="w-full h-10 px-3 bg-white border border-slate-300 rounded-xl text-sm font-bold text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-colors"
                 />
                 {typeof formAmount === 'number' && formAmount > 0 && (
-                  <p className="text-[11px] text-enterprise-600 font-semibold mt-1">
+                   <p className="text-[11px] text-brand-700 font-semibold mt-1">
                     Terbaca: {formatRupiah(formAmount)}
                   </p>
                 )}

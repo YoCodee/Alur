@@ -269,7 +269,7 @@ export default function StockPage() {
       const json = await res.json();
       if (!res.ok) throw new Error(json.error?.message || 'Gagal melakukan restock');
 
-      alert(`Restock berhasil! Stok ${restockProduct.name} bertambah ${restockQty} unit.`);
+      alert(`Barang masuk berhasil dicatat. Stok ${restockProduct.name} bertambah ${restockQty} unit.`);
       setRestockProduct(null);
       setRestockQty('');
       setRestockCost('');
@@ -310,7 +310,7 @@ export default function StockPage() {
       const json = await res.json();
       if (!res.ok) throw new Error(json.error?.message || 'Gagal menyesuaikan stok');
 
-      alert(`Opname berhasil! Stok ${adjustProduct.name} disesuaikan menjadi ${adjustNewStock} unit.`);
+      alert(`Stok ${adjustProduct.name} berhasil disesuaikan menjadi ${adjustNewStock} unit.`);
       setAdjustProduct(null);
       setAdjustNewStock('');
       setAdjustReason('');
@@ -459,37 +459,37 @@ export default function StockPage() {
 
   // Movement badge formatter
   const renderMovementBadge = (type: string, change: number) => {
-    let variant: 'neutral' | 'success' | 'warning' | 'danger' | 'brand' | 'enterprise' = 'neutral';
+    let variant: 'neutral' | 'success' | 'warning' | 'danger' | 'brand' = 'neutral';
     let label = type;
 
     switch (type) {
       case 'SALE':
-        variant = 'enterprise';
+        variant = 'brand';
         label = 'Penjualan';
         break;
       case 'VOID_RETURN':
         variant = 'warning';
-        label = 'Void (Kembali)';
+        label = 'Stok kembali dari pembatalan';
         break;
       case 'RESTOCK':
         variant = 'success';
-        label = 'Restock Masuk';
+        label = 'Barang Masuk';
         break;
       case 'ADJUSTMENT':
         variant = 'warning';
-        label = 'Opname Fisik';
+        label = 'Penyesuaian Stok';
         break;
       case 'TRANSFER_OUT':
         variant = 'brand';
-        label = 'Transfer Keluar';
+        label = 'Pemindahan Keluar';
         break;
       case 'TRANSFER_IN':
-        variant = 'enterprise';
-        label = 'Transfer Masuk';
+        variant = 'brand';
+        label = 'Pemindahan Masuk';
         break;
       case 'IMPORT':
         variant = 'neutral';
-        label = 'Impor Batch';
+        label = 'Impor Data';
         break;
     }
 
@@ -517,12 +517,12 @@ export default function StockPage() {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-                Manajemen Stok &amp; Mutasi Antarcabang
+                Stok &amp; Pemindahan Antarcabang
               </h1>
-              <Badge variant="enterprise">Khusus Owner</Badge>
+              <Badge variant="brand">Khusus Owner</Badge>
             </div>
             <p className="text-sm text-slate-500 mt-0.5">
-              Kelola restock barang, opname penyesuaian fisik, transfer antarcabang cerdas, dan audit kartu stok
+              Catat barang masuk, sesuaikan stok, dan pindahkan barang antarcabang.
             </p>
           </div>
 
@@ -558,7 +558,7 @@ export default function StockPage() {
             }`}
           >
             <Boxes className="w-3.5 h-3.5" />
-            Inventaris &amp; Aksi Cepat
+            Inventaris
           </button>
           <button
             type="button"
@@ -570,9 +570,9 @@ export default function StockPage() {
             }`}
           >
             <ArrowLeftRight className="w-3.5 h-3.5" />
-            Transfer Antarcabang
+            Pemindahan Antarcabang
             {recommendations.length > 0 && (
-              <span className="px-1.5 py-0.5 rounded-md text-[10px] font-medium bg-enterprise-600 text-white">
+              <span className="px-1.5 py-0.5 rounded-md text-[10px] font-medium bg-brand-500 text-white">
                 {recommendations.length}
               </span>
             )}
@@ -599,7 +599,7 @@ export default function StockPage() {
             }`}
           >
             <History className="w-3.5 h-3.5" />
-            Log Riwayat Kartu Stok
+            Riwayat Perubahan Stok
           </button>
         </div>
 
@@ -638,7 +638,7 @@ export default function StockPage() {
               }
               metrics={[
                 {
-                  label: 'Total SKU Terdata',
+                  label: 'Jumlah Produk',
                   value: summaryMetrics.totalItems,
                   subtext: 'Produk aktif dalam katalog',
                   badge: <Badge variant="neutral">Katalog</Badge>,
@@ -676,7 +676,7 @@ export default function StockPage() {
                 {
                   label: 'Nilai Aset Persediaan',
                   value: formatRupiah(summaryMetrics.totalAssetValue),
-                  subtext: 'Kalkulasi HPP × Stok Fisik',
+                  subtext: 'Modal barang × jumlah stok',
                   badge: <Badge variant="brand">Aset Modal</Badge>,
                 },
               ]}
@@ -690,9 +690,9 @@ export default function StockPage() {
                   aria-label="Pilih cabang"
                   value={selectedBranchId}
                   onChange={(e) => setSelectedBranchId(e.target.value)}
-                  className="h-9 px-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-900 focus:bg-white focus:border-enterprise-500 focus:ring-2 focus:ring-enterprise-500/20 transition-colors cursor-pointer"
+                  className="h-9 px-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-900 focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-colors cursor-pointer"
                 >
-                  <option value="ALL">Semua Cabang (Konsolidasi)</option>
+                  <option value="ALL">Semua Cabang</option>
                   {branches.map((b) => (
                     <option key={b.id} value={b.id}>
                       {b.name}
@@ -705,10 +705,10 @@ export default function StockPage() {
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
-                  placeholder="Cari SKU, nama produk, kategori..."
+                  placeholder="Cari kode produk, nama, atau kategori..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-9 pl-9 pr-8 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-enterprise-500 focus:ring-2 focus:ring-enterprise-500/20 transition-colors"
+                  className="w-full h-9 pl-9 pr-8 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-colors"
                 />
                 {searchQuery && (
                   <button
@@ -726,7 +726,7 @@ export default function StockPage() {
             <div className="rounded-xl border border-slate-200 bg-white shadow-card overflow-hidden">
               {loading ? (
                 <div className="py-20 flex flex-col items-center justify-center text-slate-400">
-                  <Loader2 className="w-8 h-8 animate-spin text-enterprise-600 mb-2" />
+                  <Loader2 className="w-8 h-8 animate-spin text-sage-600 mb-2" />
                   <p className="text-sm font-medium text-slate-600">Memuat stok persediaan produk...</p>
                 </div>
               ) : filteredProducts.length === 0 ? (
@@ -747,11 +747,11 @@ export default function StockPage() {
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
                       <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
-                        <th className="py-3 px-4">SKU / Nama Produk</th>
+                        <th className="py-3 px-4">Kode / Nama Produk</th>
                         <th className="py-3 px-4">Cabang</th>
                         <th className="py-3 px-4">Kategori</th>
-                        <th className="py-3 px-4 text-right">Harga Modal (HPP)</th>
-                        <th className="py-3 px-4 text-center">Stok Sistem</th>
+                        <th className="py-3 px-4 text-right">Modal</th>
+                        <th className="py-3 px-4 text-center">Jumlah Stok</th>
                         <th className="py-3 px-4 text-center">Status</th>
                         <th className="py-3 px-4 text-center">Aksi Cepat</th>
                       </tr>
@@ -812,9 +812,9 @@ export default function StockPage() {
                                     setRestockNote('');
                                   }}
                                   className="h-7 text-[11px] text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 border-emerald-200 flex items-center gap-1"
-                                  title="Restock barang masuk"
+                                  title="Catat barang masuk"
                                 >
-                                  <Plus className="w-3 h-3 text-emerald-600" /> Restock
+                                  <Plus className="w-3 h-3 text-emerald-600" /> Barang Masuk
                                 </Button>
                                 <Button
                                   variant="secondary"
@@ -827,7 +827,7 @@ export default function StockPage() {
                                   className="h-7 text-[11px] text-slate-700 hover:text-slate-900 hover:bg-slate-100 flex items-center gap-1"
                                   title="Penyesuaian stok opname fisik"
                                 >
-                                  <RefreshCw className="w-3 h-3 text-slate-500" /> Opname
+                                  <RefreshCw className="w-3 h-3 text-slate-500" /> Sesuaikan
                                 </Button>
                               </div>
                             </td>
@@ -849,7 +849,7 @@ export default function StockPage() {
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-enterprise-600 text-white flex items-center justify-center shadow-2xs shrink-0">
+                  <div className="w-9 h-9 rounded-xl bg-brand-500 text-white flex items-center justify-center shadow-2xs shrink-0">
                     <Sparkles className="w-4 h-4" />
                   </div>
                   <div>
@@ -858,13 +858,13 @@ export default function StockPage() {
                         Rekomendasi Mutasi Antarcabang Otomatis
                       </h2>
                       {recommendations.length > 0 && (
-                        <Badge variant="enterprise" className="text-[10px]">
+                        <Badge variant="brand" className="text-[10px]">
                           {recommendations.length} Saran Aktif
                         </Badge>
                       )}
                     </div>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      Algoritma cerdas mendeteksi surplus &amp; defisit stok antarcabang dengan perhitungan margin layak.
+                      Kami mencari cabang yang kelebihan atau kekurangan stok untuk menyarankan pemindahan barang.
                     </p>
                   </div>
                 </div>
@@ -873,7 +873,7 @@ export default function StockPage() {
                   size="sm"
                   onClick={fetchRecommendations}
                   disabled={recsLoading}
-                  className="h-8 text-xs text-enterprise-700 bg-white hover:bg-enterprise-50 border-enterprise-200 flex items-center gap-1.5 w-fit"
+                  className="h-8 text-xs text-brand-700 bg-white hover:bg-brand-50 border-brand-200 flex items-center gap-1.5 w-fit"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${recsLoading ? 'animate-spin' : ''}`} />
                   Refresh Analisis
@@ -882,7 +882,7 @@ export default function StockPage() {
 
               {recsLoading ? (
                 <div className="py-10 flex flex-col items-center justify-center text-slate-400 gap-2">
-                  <Loader2 className="w-6 h-6 animate-spin text-enterprise-600" />
+                  <Loader2 className="w-6 h-6 animate-spin text-sage-600" />
                   <span className="text-xs font-medium">Menganalisis pergerakan stok seluruh cabang...</span>
                 </div>
               ) : recommendations.length === 0 ? (
@@ -902,7 +902,7 @@ export default function StockPage() {
                   {recommendations.map((rec) => (
                     <div
                       key={rec.id}
-                      className="bg-white border border-slate-200 rounded-xl p-4 shadow-2xs hover:border-enterprise-300 transition-all flex flex-col justify-between gap-3"
+                      className="bg-white border border-slate-200 rounded-xl p-4 shadow-2xs hover:border-brand-300 transition-all flex flex-col justify-between gap-3"
                     >
                       <div className="space-y-2.5">
                         <div className="flex items-center justify-between gap-2">
@@ -914,13 +914,13 @@ export default function StockPage() {
                             {rec.urgency === 'CRITICAL' ? 'Kritis / Habis' : 'Disarankan'}
                           </Badge>
                           <span className="text-[11px] font-mono font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                            Net: +{formatRupiah(rec.net_benefit)}
+                          Perkiraan manfaat: +{formatRupiah(rec.net_benefit)}
                           </span>
                         </div>
 
                         <div>
                           <h3 className="text-xs font-bold text-slate-900">{rec.product_name}</h3>
-                          <p className="text-[11px] text-slate-400 font-mono mt-0.5">SKU: {rec.sku}</p>
+                          <p className="text-[11px] text-slate-400 font-mono mt-0.5">Kode produk: {rec.sku}</p>
                         </div>
 
                         {/* Route Transfer (stock levels shown inline; reason stays below) */}
@@ -939,7 +939,7 @@ export default function StockPage() {
                             </span>
                           </div>
                           <div className="flex flex-col items-center px-2">
-                            <span className="text-[10px] font-medium text-enterprise-700 bg-enterprise-100 px-2 py-0.5 rounded-md">
+                            <span className="text-[10px] font-medium text-brand-700 bg-brand-100 px-2 py-0.5 rounded-md">
                               {rec.transfer_qty} unit
                             </span>
                             <ArrowRight className="w-3.5 h-3.5 text-slate-400 my-0.5" />
@@ -988,7 +988,7 @@ export default function StockPage() {
                           ) : (
                             <>
                               <Check className="w-3.5 h-3.5" />
-                              Eksekusi 1-Klik
+                              Pindahkan Stok
                             </>
                           )}
                         </Button>
@@ -1004,7 +1004,7 @@ export default function StockPage() {
               <div>
                 <h2 className="text-base font-bold text-slate-900">Form Transfer Manual Antarcabang</h2>
                 <p className="text-xs text-slate-500">
-                  Pindahkan persediaan barang dengan SKU yang sama dari satu cabang ke cabang lainnya secara atomik.
+                  Pindahkan produk dengan kode yang sama dari satu cabang ke cabang lain.
                 </p>
               </div>
 
@@ -1028,7 +1028,7 @@ export default function StockPage() {
                           setFromProductId('');
                           setToProductId('');
                         }}
-                        className="w-full h-10 px-3 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-900 focus:ring-2 focus:ring-enterprise-500/20 focus:border-enterprise-600 transition-colors"
+                        className="w-full h-10 px-3 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-colors"
                       >
                         {branches.map((b) => (
                           <option key={b.id} value={b.id}>
@@ -1049,7 +1049,7 @@ export default function StockPage() {
                           setFromProductId(e.target.value);
                           setToProductId('');
                         }}
-                        className="w-full h-10 px-3 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-900 focus:ring-2 focus:ring-enterprise-500/20 focus:border-enterprise-600 transition-colors"
+                        className="w-full h-10 px-3 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-colors"
                       >
                         <option value="">-- Pilih Produk --</option>
                         {fromBranchProducts.map((p) => (
@@ -1086,7 +1086,7 @@ export default function StockPage() {
                           setToBranchId(e.target.value);
                           setToProductId('');
                         }}
-                        className="w-full h-10 px-3 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-900 focus:ring-2 focus:ring-enterprise-500/20 focus:border-enterprise-600 transition-colors"
+                        className="w-full h-10 px-3 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-colors"
                       >
                         {branches
                           .filter((b) => b.id !== fromBranchId)
@@ -1100,19 +1100,19 @@ export default function StockPage() {
 
                     <div>
                       <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
-                        Produk Target (SKU Sama)
+                        Produk Tujuan
                       </label>
                       <select
                         aria-label="Pilih produk target"
                         disabled={!selectedFromProduct || toBranchEligibleProducts.length === 0}
                         value={toProductId}
                         onChange={(e) => setToProductId(e.target.value)}
-                        className="w-full h-10 px-3 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-900 focus:ring-2 focus:ring-enterprise-500/20 focus:border-enterprise-600 disabled:bg-slate-100 transition-colors"
+                        className="w-full h-10 px-3 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 disabled:bg-slate-100 transition-colors"
                       >
                         {toBranchEligibleProducts.length === 0 ? (
                           <option value="">
                             {selectedFromProduct
-                              ? 'SKU ini belum ada di cabang tujuan'
+                              ? 'Produk ini belum tersedia di cabang tujuan'
                               : '-- Pilih produk asal dahulu --'}
                           </option>
                         ) : (
@@ -1137,7 +1137,7 @@ export default function StockPage() {
                 </div>
 
                 {/* Transfer Quantity & Calculation */}
-                <div className="p-4 bg-enterprise-50/40 border border-enterprise-200/80 rounded-xl space-y-3">
+                <div className="p-4 bg-brand-50/40 border border-brand-200/80 rounded-xl space-y-3">
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1.5">
                       Jumlah Unit yang Ditransfer <span className="text-rose-500">*</span>
@@ -1152,12 +1152,12 @@ export default function StockPage() {
                         setTransferQty(e.target.value === '' ? '' : parseInt(e.target.value, 10))
                       }
                       placeholder="Contoh: 10"
-                      className="w-full h-11 px-3.5 bg-white border border-slate-300 rounded-xl text-base font-bold text-slate-900 focus:ring-2 focus:ring-enterprise-500/20 focus:border-enterprise-600 transition-colors"
+                      className="w-full h-11 px-3.5 bg-white border border-slate-300 rounded-xl text-base font-bold text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-colors"
                     />
                   </div>
 
                   {selectedFromProduct && selectedToProduct && typeof transferQty === 'number' && transferQty > 0 && (
-                    <div className="grid grid-cols-2 gap-3 text-xs pt-2 border-t border-enterprise-200/60">
+                    <div className="grid grid-cols-2 gap-3 text-xs pt-2 border-t border-brand-200/60">
                       <div>
                         <span className="text-slate-500">Sisa Stok Cabang Asal:</span>
                         <p className="font-mono font-bold text-rose-600 mt-0.5">
@@ -1221,14 +1221,14 @@ export default function StockPage() {
             {/* Filter Bar */}
             <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-card flex flex-col sm:flex-row gap-3 items-center justify-between">
               <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                <Filter className="w-4 h-4 text-enterprise-600 shrink-0" />
+                <Filter className="w-4 h-4 text-brand-600 shrink-0" />
                 <select
                   aria-label="Pilih cabang riwayat mutasi"
                   value={historyBranchId}
                   onChange={(e) => setHistoryBranchId(e.target.value)}
-                  className="h-9 px-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-900 focus:bg-white focus:border-enterprise-500 focus:ring-2 focus:ring-enterprise-500/20 transition-colors cursor-pointer"
+                  className="h-9 px-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-900 focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-colors cursor-pointer"
                 >
-                  <option value="ALL">Semua Cabang (Konsolidasi)</option>
+                  <option value="ALL">Semua Cabang</option>
                   {branches.map((b) => (
                     <option key={b.id} value={b.id}>
                       {b.name}
@@ -1240,16 +1240,16 @@ export default function StockPage() {
                   aria-label="Pilih jenis mutasi stok"
                   value={historyType}
                   onChange={(e) => setHistoryType(e.target.value)}
-                  className="h-9 px-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-900 focus:bg-white focus:border-enterprise-500 focus:ring-2 focus:ring-enterprise-500/20 transition-colors cursor-pointer"
+                  className="h-9 px-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-900 focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-colors cursor-pointer"
                 >
                   <option value="ALL">Semua Jenis Mutasi</option>
-                  <option value="SALE">Penjualan (SALE)</option>
-                  <option value="VOID_RETURN">Void Return</option>
-                  <option value="RESTOCK">Restock Masuk</option>
-                  <option value="ADJUSTMENT">Opname Fisik</option>
+                  <option value="SALE">Penjualan</option>
+                  <option value="VOID_RETURN">Stok kembali dari pembatalan</option>
+                  <option value="RESTOCK">Barang masuk</option>
+                  <option value="ADJUSTMENT">Penyesuaian stok</option>
                   <option value="TRANSFER_OUT">Transfer Keluar</option>
                   <option value="TRANSFER_IN">Transfer Masuk</option>
-                  <option value="IMPORT">Impor Batch</option>
+                  <option value="IMPORT">Impor data</option>
                 </select>
               </div>
 
@@ -1257,7 +1257,7 @@ export default function StockPage() {
                 variant="ghost"
                 size="sm"
                 onClick={fetchMovements}
-                className="h-8 text-xs text-enterprise-600 hover:text-enterprise-700 flex items-center gap-1.5"
+                className="h-8 text-xs text-brand-600 hover:text-brand-700 flex items-center gap-1.5"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${movementsLoading ? 'animate-spin' : ''}`} /> Segarkan
               </Button>
@@ -1267,7 +1267,7 @@ export default function StockPage() {
             <div className="rounded-xl border border-slate-200 bg-white shadow-card overflow-hidden">
               {movementsLoading ? (
                 <div className="py-20 flex flex-col items-center justify-center text-slate-400">
-                  <Loader2 className="w-8 h-8 animate-spin text-enterprise-600 mb-2" />
+                  <Loader2 className="w-8 h-8 animate-spin text-sage-600 mb-2" />
                   <p className="text-sm font-medium text-slate-600">Memuat log pergerakan stok...</p>
                 </div>
               ) : movements.length === 0 ? (
@@ -1275,7 +1275,7 @@ export default function StockPage() {
                   <EmptyState
                     icon={History}
                     title="Belum ada riwayat pergerakan stok"
-                    description="Setiap transaksi kasir POS, restock, opname fisik, atau transfer cabang otomatis tercatat di log audit kartu stok ini."
+                    description="Perubahan stok dari penjualan, barang masuk, penyesuaian, dan pemindahan antarcabang tercatat di sini."
                   />
                 </div>
               ) : (
@@ -1337,7 +1337,7 @@ export default function StockPage() {
                     <Plus className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold">Restock Barang Masuk</h3>
+                    <h3 className="text-sm font-bold">Catat Barang Masuk</h3>
                     <p className="text-[11px] text-emerald-700 font-mono">
                       {restockProduct.name} ({restockProduct.sku})
                     </p>
@@ -1435,7 +1435,7 @@ export default function StockPage() {
                         Menyimpan...
                       </>
                     ) : (
-                      'Simpan Restock'
+                      'Simpan Barang Masuk'
                     )}
                   </Button>
                 </div>
@@ -1454,7 +1454,7 @@ export default function StockPage() {
                     <RefreshCw className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold">Stock Opname (Penyesuaian Fisik)</h3>
+                    <h3 className="text-sm font-bold">Penyesuaian Stok</h3>
                     <p className="text-[11px] text-amber-700 font-mono">
                       {adjustProduct.name} ({adjustProduct.sku})
                     </p>
@@ -1471,7 +1471,7 @@ export default function StockPage() {
 
               <form onSubmit={handleAdjustSubmit} className="p-6 space-y-4">
                 <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs flex justify-between items-center">
-                  <span className="text-slate-500 font-medium">Stok Sistem Saat Ini:</span>
+                    <span className="text-slate-500 font-medium">Stok Saat Ini:</span>
                   <span className="text-base font-mono font-bold text-slate-900">
                     {adjustProduct.stock} unit
                   </span>
@@ -1479,7 +1479,7 @@ export default function StockPage() {
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                    Stok Fisik Riil Hasil Hitung <span className="text-rose-500">*</span>
+                    Jumlah Stok Hasil Hitung <span className="text-rose-500">*</span>
                   </label>
                   <input
                     aria-label="Stok fisik hasil hitung"
@@ -1514,7 +1514,7 @@ export default function StockPage() {
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                    Alasan Selisih Opname <span className="text-rose-500">*</span>
+                    Alasan Penyesuaian <span className="text-rose-500">*</span>
                   </label>
                   <textarea
                     aria-label="Alasan selisih opname"
@@ -1549,7 +1549,7 @@ export default function StockPage() {
                         Menyimpan...
                       </>
                     ) : (
-                      'Simpan Opname'
+                      'Simpan Penyesuaian'
                     )}
                   </Button>
                 </div>

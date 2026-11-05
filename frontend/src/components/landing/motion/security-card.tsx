@@ -168,11 +168,11 @@ export function SecurityCardDemo() {
         {/* Text Area */}
         <div ref={textGroupRef} className="space-y-2">
           <h3 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
-            Aman & Tervalidasi Standar Bank
+            Catatan usaha lebih tertata
           </h3>
 
           <p className="text-xs sm:text-[13px] text-slate-600 leading-relaxed">
-            PostgreSQL Row Level Security (RLS) di setiap baris, log audit pembatalan nota (VOID) anti-fraud, dan ekspor laporan keuangan terstandarisasi pengajuan kredit bank/KUR.
+            Simpan catatan transaksi dan tinjau laporan usaha dalam satu alur.
           </p>
         </div>
       </div>
@@ -184,14 +184,14 @@ export function SecurityCardDemo() {
             ref={dot1Ref}
             className="h-1.5 w-1.5 rounded-full bg-emerald-600 origin-center shrink-0"
           />
-          <span>RLS PostgreSQL Multi-Tenant</span>
+          <span>Catatan transaksi</span>
         </div>
         <div className="flex items-center gap-2 text-xs text-slate-600">
           <span
             ref={dot2Ref}
             className="h-1.5 w-1.5 rounded-full bg-brand-600 origin-center shrink-0"
           />
-          <span>Audit Log VOID Anti-Manipulasi</span>
+          <span>Laporan usaha</span>
         </div>
       </div>
     </div>

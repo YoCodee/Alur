@@ -477,7 +477,7 @@ export default function DashboardPage() {
             <p className="max-w-xl text-sm leading-relaxed text-stone-600">
               {loading
                 ? 'Merangkum data gerai Anda…'
-                : `Ini ringkasan ${branchList.length} gerai Anda — apa yang terjadi kemarin, apa yang perlu diperhatikan, dan apa yang bisa dilakukan sekarang.`}
+                : `Ini ringkasan ${branchList.length} gerai Anda: apa yang terjadi kemarin, apa yang perlu diperhatikan, dan apa yang bisa dilakukan sekarang.`}
             </p>
           </div>
 

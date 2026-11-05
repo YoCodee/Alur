@@ -118,7 +118,7 @@ export default function ReportsPage() {
     }
     const currentBranchName =
       selectedBranchId === 'ALL'
-        ? 'Konsolidasi Seluruh Cabang'
+        ? 'Seluruh Cabang'
         : branches.find((b) => b.id === selectedBranchId)?.name || 'Cabang';
     downloadFinancialReportCsv(report, `Alur - ${currentBranchName}`);
   };
@@ -130,14 +130,14 @@ export default function ReportsPage() {
     }
     const currentBranchName =
       selectedBranchId === 'ALL'
-        ? 'Konsolidasi Seluruh Cabang'
+        ? 'Seluruh Cabang'
         : branches.find((b) => b.id === selectedBranchId)?.name || 'Cabang';
     openPrintableReportPdf(report, 'Alur UMKM', currentBranchName);
   };
 
   const branchDisplay =
     selectedBranchId === 'ALL'
-      ? 'Konsolidasi Seluruh Cabang'
+      ? '(Seluruh Cabang)'
       : branches.find((b) => b.id === selectedBranchId)?.name || 'Cabang Terpilih';
 
   return (
@@ -148,13 +148,11 @@ export default function ReportsPage() {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-                Laporan Laba Rugi &amp; Auto-Ledger
+                Laporan Keuangan
               </h1>
-              <Badge variant="enterprise">Auto-Ledger</Badge>
-              <Badge variant="brand">Standar Akuntansi</Badge>
             </div>
             <p className="text-sm text-slate-500 mt-0.5">
-              Pembukuan otomatis multi-cabang: Omzet, HPP modal, Beban operasional, dan Laba bersih tersusun rapi
+              Ringkasan omzet, modal barang, pengeluaran, dan laba usaha.
             </p>
           </div>
 
@@ -178,7 +176,7 @@ export default function ReportsPage() {
               className="flex items-center gap-1.5 shadow-2xs"
             >
               <Download className="w-4 h-4 text-emerald-600" />
-              <span>Ekspor Excel (.csv)</span>
+              <span>Ekspor CSV</span>
             </Button>
           </div>
         </div>
@@ -196,7 +194,7 @@ export default function ReportsPage() {
                 onChange={(e) => setSelectedBranchId(e.target.value)}
                 className="bg-transparent text-xs font-semibold text-slate-800 focus:outline-hidden cursor-pointer"
               >
-                <option value="ALL">Semua Cabang (Konsolidasi)</option>
+                <option value="ALL">Semua Cabang</option>
                 {branches.map((b) => (
                   <option key={b.id} value={b.id}>
                     {b.name}
@@ -218,7 +216,7 @@ export default function ReportsPage() {
                   onClick={() => setPeriod(p.id)}
                   className={`px-3 py-1.5 rounded-lg font-semibold transition-all whitespace-nowrap cursor-pointer ${
                     period === p.id
-                      ? 'bg-white text-enterprise-600 shadow-xs'
+                       ? 'bg-white text-brand-600 shadow-xs'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
@@ -258,7 +256,7 @@ export default function ReportsPage() {
               className="h-9 w-9 p-0 flex items-center justify-center text-slate-600 hover:text-slate-900"
               title="Perbarui Data Laporan"
             >
-              <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-enterprise-600' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-sage-600' : ''}`} />
             </Button>
           </div>
         </div>
@@ -283,7 +281,7 @@ export default function ReportsPage() {
         {/* Loading State */}
         {loading && !report ? (
           <div className="p-16 flex flex-col items-center justify-center text-slate-400 gap-3 rounded-xl border border-slate-200 bg-white">
-            <Loader2 className="w-8 h-8 animate-spin text-enterprise-600" />
+            <Loader2 className="w-8 h-8 animate-spin text-sage-600" />
             <p className="text-xs font-semibold text-slate-600">
               Menghitung buku besar otomatis dan mengagregasi laporan finansial...
             </p>
@@ -292,7 +290,7 @@ export default function ReportsPage() {
           <div className="space-y-6">
             {/* 4-KPI Metric Strip */}
             <MetricStrip
-              title={`Laporan Keuangan — ${branchDisplay}`}
+              title={`Laporan Keuangan ${branchDisplay}`}
               action={
                 <div className="flex items-center gap-3 text-xs text-slate-500 font-medium">
                   <span className="flex items-center gap-1">
@@ -304,41 +302,36 @@ export default function ReportsPage() {
                   </span>
                   <span>•</span>
                   <span>
-                    <strong className="text-slate-800 font-mono">{report.metrics.total_transactions}</strong> trx
+                    <strong className="text-slate-800 font-mono">{report.metrics.total_transactions}</strong> transaksi
                     {report.metrics.void_count > 0 && (
-                      <span className="text-rose-600 ml-1">({report.metrics.void_count} void)</span>
+                      <span className="text-rose-600 ml-1">({report.metrics.void_count} dibatalkan)</span>
                     )}
                   </span>
                 </div>
               }
               metrics={[
                 {
-                  label: 'Total Omzet (Penjualan)',
+                  label: 'Total Omzet',
                   value: formatRupiah(report.metrics.total_revenue),
                   subtext: `Rata-rata ${formatRupiah(report.metrics.average_ticket_size)}/transaksi`,
-                  badge: <Badge variant="enterprise">Omzet</Badge>,
                 },
                 {
-                  label: 'Total HPP (Modal Pokok)',
+                  label: 'Modal Barang',
                   value: formatRupiah(report.metrics.total_cogs),
                   subtext:
                     report.metrics.total_revenue > 0
                       ? `${((report.metrics.total_cogs / report.metrics.total_revenue) * 100).toFixed(1)}% dari omzet`
                       : '0% dari omzet',
-                  badge: <Badge variant="neutral">COGS</Badge>,
                 },
                 {
-                  label: 'Beban Biaya Operasional',
+                  label: 'Pengeluaran Operasional',
                   value: formatRupiah(report.metrics.total_expenses),
                   subtext: `${report.expenses_by_category.length} kategori pengeluaran`,
-                  badge: <Badge variant="brand">Beban</Badge>,
                 },
                 {
-                  label: 'Laba Bersih Operasional',
+                  label: 'Laba Bersih',
                   value: `${report.metrics.net_profit >= 0 ? '+' : ''}${formatRupiah(report.metrics.net_profit)}`,
-                  subtext: `Margin Bersih ${report.metrics.net_margin_pct}% • ${
-                    report.metrics.net_profit >= 0 ? 'Surplus Operasional' : 'Defisit Operasional'
-                  }`,
+                  subtext: `Margin bersih ${report.metrics.net_margin_pct}%`,
                   badge:
                     report.metrics.net_profit >= 0 ? (
                       <Badge variant="success" dot>
@@ -356,10 +349,10 @@ export default function ReportsPage() {
             {/* TAB NAVIGATION (Segmented Control) */}
             <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200 w-fit">
               {[
-                { id: 'overview', label: 'Ikhtisar & Tren Finansial', icon: BarChart3 },
-                { id: 'expenses', label: 'Struktur Beban Biaya', icon: PieChart },
-                { id: 'branches', label: 'Klasemen Antarcabang', icon: Building2 },
-                { id: 'products', label: 'Peringkat Margin Produk', icon: Package },
+                { id: 'overview', label: 'Ringkasan', icon: BarChart3 },
+                { id: 'expenses', label: 'Pengeluaran', icon: PieChart },
+                { id: 'branches', label: 'Cabang', icon: Building2 },
+                { id: 'products', label: 'Produk', icon: Package },
               ].map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -391,20 +384,17 @@ export default function ReportsPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <h2 className="text-sm font-bold text-slate-900">
-                        Tren Harian Omzet vs Beban Biaya
-                      </h2>
-                      <p className="text-xs text-slate-500">
-                        Visualisasi dinamika pendapatan, pengeluaran harian, dan profitabilitas
-                      </p>
+                         Omzet dan Pengeluaran Harian
+                       </h2>
                     </div>
                     <div className="flex items-center gap-3 text-[11px] font-semibold text-slate-600">
                       <div className="flex items-center gap-1.5">
-                        <span className="w-2.5 h-2.5 rounded-full bg-enterprise-600" />
+                        <span className="w-2.5 h-2.5 rounded-full bg-brand-500" />
                         <span>Omzet</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-                        <span>Beban Biaya</span>
+                         <span>Pengeluaran</span>
                       </div>
                     </div>
                   </div>
@@ -453,7 +443,7 @@ export default function ReportsPage() {
                                   {/* Revenue bar */}
                                   <div
                                     style={{ height: `${revHeight}px` }}
-                                    className="w-2.5 bg-enterprise-600 group-hover:bg-enterprise-700 rounded-t transition-all"
+                                    className="w-2.5 bg-brand-500 group-hover:bg-brand-600 rounded-t transition-all"
                                   />
                                   {/* Expense bar */}
                                   <div
@@ -486,7 +476,7 @@ export default function ReportsPage() {
                   <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-card space-y-4">
                     <div className="flex items-center justify-between">
                       <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                        <CreditCard className="w-4 h-4 text-enterprise-600" />
+                        <CreditCard className="w-4 h-4 text-sage-600" />
                         Metode Pembayaran
                       </h2>
                       <Badge variant="neutral" className="text-[10px]">
@@ -500,9 +490,9 @@ export default function ReportsPage() {
                           <div className="flex items-center justify-between text-xs">
                             <span className="font-bold text-slate-700">
                               {pm.payment_method === 'CASH'
-                                ? '💵 Uang Tunai (CASH)'
+                                ? 'Tunai'
                                 : pm.payment_method === 'QRIS_SIM'
-                                ? '📱 QRIS Statis/Simulasi'
+                                ? 'QRIS'
                                 : pm.payment_method}
                             </span>
                             <span className="font-mono font-bold text-slate-900">
@@ -517,7 +507,7 @@ export default function ReportsPage() {
                             <div
                               style={{ width: `${pm.percentage_of_revenue}%` }}
                               className={`h-full rounded-full ${
-                                pm.payment_method === 'CASH' ? 'bg-enterprise-600' : 'bg-indigo-600'
+                                pm.payment_method === 'CASH' ? 'bg-brand-500' : 'bg-sage-500'
                               }`}
                             />
                           </div>
@@ -526,39 +516,39 @@ export default function ReportsPage() {
                     </div>
                   </div>
 
-                  {/* Financial Flow Cascade Card */}
-                  <div className="rounded-xl bg-slate-950 text-white p-5 shadow-card border border-slate-800 space-y-3">
+                  {/* Financial Summary Card */}
+                  <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-card space-y-4">
                     <div className="flex items-center justify-between">
-                      <h2 className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-                        Arus Nilai Tambah (Value Flow)
+                      <h2 className="text-sm font-bold text-slate-900">
+                        Ringkasan Laba Rugi
                       </h2>
-                      <Badge variant="enterprise" className="text-[10px] bg-slate-800 text-blue-300 border-slate-700">
-                        Auto-Ledger
+                      <Badge variant="intelligence" className="text-[10px]">
+                        Dihitung otomatis
                       </Badge>
                     </div>
                     <div className="space-y-2 text-xs">
-                      <div className="flex justify-between items-center py-1.5 border-b border-slate-800">
-                        <span className="text-slate-400">Omzet Penjualan Bersih</span>
-                        <span className="font-mono font-bold text-white">
+                      <div className="flex justify-between items-center gap-3 py-2 border-b border-slate-100">
+                         <span className="text-slate-600">Omzet</span>
+                        <span className="font-mono font-bold text-brand-700">
                           {formatRupiah(report.metrics.total_revenue)}
                         </span>
                       </div>
-                      <div className="flex justify-between items-center py-1.5 border-b border-slate-800 text-slate-400">
-                        <span>(-) Beban Pokok Penjualan (HPP)</span>
-                        <span className="font-mono text-slate-300">
+                      <div className="flex justify-between items-center gap-3 py-2 border-b border-slate-100 text-slate-500">
+                         <span>Modal Barang</span>
+                        <span className="font-mono text-slate-600">
                           -{formatRupiah(report.metrics.total_cogs)}
                         </span>
                       </div>
-                      <div className="flex justify-between items-center py-1.5 border-b border-slate-800 font-bold text-blue-400">
-                        <span>(=) Laba Kotor Usaha ({report.metrics.gross_margin_pct}%)</span>
+                      <div className="flex justify-between items-center gap-3 py-2 border-b border-slate-100 font-semibold text-sage-700">
+                        <span>Laba Kotor <span className="font-normal text-sage-600">({report.metrics.gross_margin_pct}%)</span></span>
                         <span className="font-mono">{formatRupiah(report.metrics.gross_profit)}</span>
                       </div>
-                      <div className="flex justify-between items-center py-1.5 border-b border-slate-800 text-rose-300">
-                        <span>(-) Beban Biaya Operasional</span>
-                        <span className="font-mono">-{formatRupiah(report.metrics.total_expenses)}</span>
+                      <div className="flex justify-between items-center gap-3 py-2 border-b border-slate-100 text-slate-600">
+                        <span>Beban Operasional</span>
+                        <span className="font-mono text-rose-600">-{formatRupiah(report.metrics.total_expenses)}</span>
                       </div>
-                      <div className="flex justify-between items-center pt-2 font-bold text-sm text-emerald-400">
-                        <span>(=) Laba Operasional Bersih</span>
+                      <div className="flex justify-between items-center gap-3 rounded-lg bg-sage-50 px-3 py-3 font-bold text-sm text-sage-800">
+                        <span>Laba Bersih</span>
                         <span className="font-mono">{formatRupiah(report.metrics.net_profit)}</span>
                       </div>
                     </div>
@@ -577,7 +567,7 @@ export default function ReportsPage() {
                     Distribusi Beban Operasional per Kategori
                   </h2>
                   <p className="text-xs text-slate-500">
-                    Memantau proporsi pengeluaran untuk efisiensi biaya dan pencegahan kebocoran operasional
+                     Rincian pengeluaran berdasarkan kategori.
                   </p>
                 </div>
 
@@ -637,14 +627,14 @@ export default function ReportsPage() {
                 <div className="p-5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div>
                     <h2 className="text-base font-bold text-slate-900">
-                      Klasemen Performa Finansial Antarcabang
+                       Performa Cabang
                     </h2>
                     <p className="text-xs text-slate-500">
-                      Perbandingan omzet, efisiensi margin, dan capaian target penjualan antarcabang
+                       Omzet, laba, dan capaian target setiap cabang.
                     </p>
                   </div>
                   <Badge variant="neutral" className="w-fit">
-                    {report.branch_performance.length} Cabang Terdata
+                     {report.branch_performance.length} Cabang
                   </Badge>
                 </div>
 
@@ -654,9 +644,9 @@ export default function ReportsPage() {
                       <tr>
                         <th className="py-3 px-4">Nama Cabang</th>
                         <th className="py-3 px-4 text-right">Omzet</th>
-                        <th className="py-3 px-4 text-right">HPP Modal</th>
-                        <th className="py-3 px-4 text-right">Laba Kotor (Margin)</th>
-                        <th className="py-3 px-4 text-right">Beban Biaya</th>
+                         <th className="py-3 px-4 text-right">Modal Barang</th>
+                         <th className="py-3 px-4 text-right">Laba Kotor</th>
+                         <th className="py-3 px-4 text-right">Pengeluaran</th>
                         <th className="py-3 px-4 text-right">Laba Bersih</th>
                         <th className="py-3 px-4 text-center">Capaian Target</th>
                       </tr>
@@ -667,7 +657,7 @@ export default function ReportsPage() {
                           <td className="py-3.5 px-4 whitespace-nowrap">
                             <span className="font-bold text-slate-900 block">{b.branch_name}</span>
                             <span className="text-[10px] text-slate-400">
-                              {b.tx_count} transaksi • Tiket: {formatRupiah(b.average_ticket)}
+                               {b.tx_count} transaksi • Rata-rata: {formatRupiah(b.average_ticket)}
                             </span>
                           </td>
                           <td className="py-3.5 px-4 text-right font-mono font-bold text-slate-900 whitespace-nowrap">
@@ -676,9 +666,9 @@ export default function ReportsPage() {
                           <td className="py-3.5 px-4 text-right font-mono text-slate-600 whitespace-nowrap">
                             {formatRupiah(b.cogs)}
                           </td>
-                          <td className="py-3.5 px-4 text-right font-mono text-enterprise-700 whitespace-nowrap">
+                          <td className="py-3.5 px-4 text-right font-mono text-sage-700 whitespace-nowrap">
                             <span className="font-bold block">{formatRupiah(b.gross_profit)}</span>
-                            <span className="text-[10px] text-enterprise-500 font-sans">
+                            <span className="text-[10px] text-sage-600 font-sans">
                               ({b.gross_margin_pct}%)
                             </span>
                           </td>
@@ -706,7 +696,7 @@ export default function ReportsPage() {
                                     className={`h-full rounded-full ${
                                       b.target_achievement_pct >= 100
                                         ? 'bg-emerald-500'
-                                        : 'bg-enterprise-600'
+                                        : 'bg-brand-500'
                                     }`}
                                   />
                                 </div>
@@ -730,10 +720,10 @@ export default function ReportsPage() {
               <div className="rounded-xl border border-slate-200 bg-white shadow-card overflow-hidden">
                 <div className="p-5 border-b border-slate-200">
                   <h2 className="text-base font-bold text-slate-900">
-                    Peringkat Kontribusi Penjualan &amp; Margin Produk
+                     Produk Teratas
                   </h2>
                   <p className="text-xs text-slate-500">
-                    Mengetahui menu/barang penyumbang omzet terbesar dan margin keuntungan terbaik
+                     Omzet dan laba kotor per produk.
                   </p>
                 </div>
 
@@ -752,17 +742,17 @@ export default function ReportsPage() {
                         <tr>
                           <th className="py-3 px-4">Nama Produk</th>
                           <th className="py-3 px-4 text-center">Kuantitas Terjual</th>
-                          <th className="py-3 px-4 text-right">Total Omzet</th>
-                          <th className="py-3 px-4 text-right">Total HPP Modal</th>
+                           <th className="py-3 px-4 text-right">Omzet</th>
+                           <th className="py-3 px-4 text-right">Modal Barang</th>
                           <th className="py-3 px-4 text-right">Laba Kotor</th>
-                          <th className="py-3 px-4 text-center">Gross Margin</th>
+                           <th className="py-3 px-4 text-center">Margin Kotor</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
                         {report.top_products.map((p, idx) => (
                           <tr key={p.product_id} className="hover:bg-slate-50/80 transition-colors">
                             <td className="py-3.5 px-4 font-bold text-slate-900 flex items-center gap-2 whitespace-nowrap">
-                              <span className="w-5 h-5 rounded-md bg-enterprise-50 text-enterprise-700 text-[10px] font-extrabold flex items-center justify-center shrink-0">
+                              <span className="w-5 h-5 rounded-md bg-brand-50 text-brand-700 text-[10px] font-extrabold flex items-center justify-center shrink-0">
                                 {idx + 1}
                               </span>
                               <span>{p.product_name}</span>
@@ -776,7 +766,7 @@ export default function ReportsPage() {
                             <td className="py-3.5 px-4 text-right font-mono text-slate-600 whitespace-nowrap">
                               {formatRupiah(p.cogs)}
                             </td>
-                            <td className="py-3.5 px-4 text-right font-mono font-bold text-enterprise-700 whitespace-nowrap">
+                            <td className="py-3.5 px-4 text-right font-mono font-bold text-sage-700 whitespace-nowrap">
                               {formatRupiah(p.gross_profit)}
                             </td>
                             <td className="py-3.5 px-4 text-center whitespace-nowrap">
