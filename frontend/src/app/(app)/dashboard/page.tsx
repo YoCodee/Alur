@@ -546,7 +546,7 @@ export default function DashboardPage() {
             </p>
             <p className="text-[11px] text-slate-600 mt-0.5">
               Migrasikan katalog produk + stok awal, riwayat penjualan, dan pengeluaran Anda sekali
-              unggah — lalu lanjutkan operasional di BizPulse.
+              unggah — lalu lanjutkan operasional di Alur.
             </p>
           </Link>
         )}
