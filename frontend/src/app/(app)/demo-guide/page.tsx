@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Sparkles,
-  ArrowRight,
   CheckCircle2,
   Layers,
   ShieldCheck,

@@ -137,6 +137,7 @@ export default function AppLayout({
     role: profile?.role,
     pathname,
     autoStart: true,
+    userKey: profile?.user_id,
   });
 
   useEffect(() => {

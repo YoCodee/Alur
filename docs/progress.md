@@ -2312,3 +2312,18 @@
 - Halaman Panduan Demo memakai tampilan terang dengan aksen brand oranye/sage, dan penjelasan lima langkah disederhanakan agar lebih mudah diikuti.
 - Panduan tur memakai font global Plus Jakarta Sans; tulisan tombol menjadi “Lanjut” dan “Kembali” tanpa panah. Label navigasi “Panduan Tur Fitur” disingkat menjadi “Panduan Fitur”.
 - Verifikasi: `npm run typecheck` lulus; `npm run lint` lulus dengan 1 warning font lama di `src/app/layout.tsx`; `npm test` lulus (19 file, 168 tes). Tampilan belum diuji langsung di browser.
+
+## Perbaikan Panduan Fitur untuk User Baru (7 Nov 2026)
+
+**Masalah:** user baru yang mendaftar masuk dashboard tidak langsung mendapat panduan driver.js.
+
+**Akar masalah (direproduksi via Chrome CDP):** flag `alur-tour-seen` disimpan global per-browser, bukan per-user. Browser yang sudah pernah memutar panduan (mis. saat menguji akun demo) membuat user baru yang mendaftar di browser sama tidak pernah dapat panduan otomatis — konsol bersih, bukan error JS.
+
+**Dimodifikasi:**
+- `frontend/src/hooks/use-dashboard-tour.ts` — flag jadi per-user (`alur-tour-seen:<user_id>`); auto-start menunggu `userKey` profil teridentifikasi agar key penyimpanan dan peran sudah benar; instance lama di-destroy sebelum start baru (cegah overlay tumpang tindih); cleanup destroy saat unmount. Penulisan flag dipindah ke `onDestroyStarted` (+ konfirmasi `destroy()` manual) karena `onDestroyed` hanya terpanggil setelah transisi 400ms driver.js selesai — close lebih cepat dari itu tidak tercatat.
+- `frontend/src/app/(app)/layout.tsx` — pass `userKey: profile?.user_id` ke hook.
+- `frontend/src/app/(app)/demo-guide/page.tsx` — hapus import `ArrowRight` tak terpakai (error lint pre-existing sejak `06c67ec` yang membuat `npm run lint` gagal).
+
+**Verifikasi E2E (Chrome headless CDP, skenario penuh):** flag global lama ada → user baru daftar → panduan muncul +2100ms → tutup → key per-user tertulis → reload → panduan tidak muncul lagi. typecheck/lint ✅ · 184 test lulus.
+
+**Catatan:** tanpa fallback ke flag legacy `alur-tour-seen` lama — fallback = bug kembali. Key lama dibiarkan (tak terbaca lagi, hanya sampah kecil di localStorage).
