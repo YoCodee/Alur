@@ -26,6 +26,7 @@ import { MetricStrip } from '@/components/ui/metric-strip';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
+import { BranchRequiredNotice } from '@/components/branch-required-notice';
 
 interface Branch {
   id: string;
@@ -53,6 +54,7 @@ export default function ExpensesPage() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
   const [currentUserRole, setCurrentUserRole] = useState<string>('OWNER');
+  const [branchesLoaded, setBranchesLoaded] = useState(false);
   const [userBranchId, setUserBranchId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -110,6 +112,7 @@ export default function ExpensesPage() {
         if (res.ok) {
           const activeBranches = (json.data || []).filter((b: Branch) => b.is_active);
           setBranches(activeBranches);
+          setBranchesLoaded(true);
           if (activeBranches.length > 0 && !formBranchId) {
             setFormBranchId(activeBranches[0].id);
           }
@@ -379,6 +382,15 @@ export default function ExpensesPage() {
     selectedBranchId !== 'ALL' ||
     selectedCategory !== 'ALL' ||
     selectedMonth !== currentMonth;
+
+  // Owner tanpa cabang: arahkan ke manajemen cabang dulu
+  if (branchesLoaded && branches.length === 0 && currentUserRole === 'OWNER') {
+    return (
+      <div className="space-y-6 pb-12">
+        <BranchRequiredNotice />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

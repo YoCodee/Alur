@@ -6,6 +6,7 @@ import { formatDateId } from '@/lib/date';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
+import { BranchRequiredNotice } from '@/components/branch-required-notice';
 import {
   Search,
   ShoppingCart,
@@ -70,6 +71,8 @@ export default function PosPage() {
   const [selectedBranchId, setSelectedBranchId] = useState<string>('');
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [branchesLoaded, setBranchesLoaded] = useState<boolean>(false);
   const [productLoading, setProductLoading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -99,6 +102,7 @@ export default function PosPage() {
       if (!res.ok) throw new Error(json.error?.message || 'Gagal memuat cabang');
       const activeBranches = (json.data || []).filter((b: Branch) => b.is_active);
       setBranches(activeBranches);
+      setBranchesLoaded(true);
       if (activeBranches.length > 0 && !selectedBranchId) {
         setSelectedBranchId(activeBranches[0].id);
       }
@@ -112,6 +116,20 @@ export default function PosPage() {
   useEffect(() => {
     fetchBranches();
   }, [fetchBranches]);
+
+  // Ambil role user agar guard "tambah cabang dulu" hanya untuk owner
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        const res = await fetch('/api/auth/me');
+        const json = await res.json();
+        if (res.ok && json?.data?.role) setUserRole(json.data.role);
+      } catch {
+        // Abaikan: guard tetap aman tanpa role
+      }
+    }
+    fetchProfile();
+  }, []);
 
   // Fetch products when selected branch changes
   const fetchProducts = useCallback(async () => {
@@ -333,6 +351,15 @@ export default function PosPage() {
       <div className="py-24 flex flex-col items-center justify-center text-slate-400">
         <Loader2 className="w-10 h-10 animate-spin text-sage-600 mb-3" />
         <p className="text-sm font-medium text-slate-600">Memuat terminal kasir POS...</p>
+      </div>
+    );
+  }
+
+  // Owner tanpa cabang: arahkan ke manajemen cabang dulu
+  if (branchesLoaded && branches.length === 0 && userRole === 'OWNER') {
+    return (
+      <div className="space-y-6 pb-12">
+        <BranchRequiredNotice />
       </div>
     );
   }

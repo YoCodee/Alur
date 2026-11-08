@@ -2327,3 +2327,14 @@
 **Verifikasi E2E (Chrome headless CDP, skenario penuh):** flag global lama ada → user baru daftar → panduan muncul +2100ms → tutup → key per-user tertulis → reload → panduan tidak muncul lagi. typecheck/lint ✅ · 184 test lulus.
 
 **Catatan:** tanpa fallback ke flag legacy `alur-tour-seen` lama — fallback = bug kembali. Key lama dibiarkan (tak terbaca lagi, hanya sampah kecil di localStorage).
+
+## Pemberitahuan "Tambah Cabang Dulu" untuk Halaman yang Membutuhkan Cabang (8 Nov 2026)
+
+**Masalah:** user baru (register hanya membuat organisasi + profil, tanpa cabang) membuka halaman Pengeluaran, POS, Produk, Kasir, Stok, atau Impor Data tanpa arahan — sebagian menampilkan data kosong yang menyesatkan (mis. tab transfer stok dengan dua select kosong dan empty-state "Persediaan Seimbang"), sebagian hanya alert "Cabang wajib dipilih." tanpa jalan keluar.
+
+**Dimodifikasi:**
+- `frontend/src/components/branch-required-notice.tsx` (baru) — komponen bersama `EmptyState` "Belum ada cabang" dengan tombol "Tambah Cabang Sekarang" yang menavigasi ke `/branches` (Manajemen Cabang).
+- `frontend/src/app/(app)/expenses/page.tsx`, `pos/page.tsx`, `products/page.tsx`, `staff/page.tsx`, `stock/page.tsx` — guard `branchesLoaded && branches.length === 0` (+ peran OWNER) merender notice menggantikan konten halaman; flag `branchesLoaded` mencegah flash sebelum fetch `/api/branches` selesai. POS kini ikut fetch `/api/auth/me` agar guard tidak mengganggu kasir; guard di halaman ber-`RoleGuard` tetap dibungkus `RoleGuard`.
+- `frontend/src/components/import/migration-wizard.tsx` — guard lama yang hanya suplemen di bawah form diganti early return notice (form tidak dirender sama sekali); empty-state lama tanpa CTA dihapus.
+
+**Verifikasi E2E (Chrome headless CDP):** user baru tanpa cabang → notice + CTA tampil di keenam halaman, klik CTA di `/expenses` navigasi ke `/branches` (7 pass, 0 fail, konsol bersih); user dengan cabang → notice tidak muncul di keenam halaman (6 pass). `npm run typecheck` lulus; `npm run lint` lulus dengan 1 warning font lama di `src/app/layout.tsx`; `npm run test` lulus (21 file, 192 tes).

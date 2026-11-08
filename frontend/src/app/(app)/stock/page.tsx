@@ -34,6 +34,7 @@ import { MetricStrip } from '@/components/ui/metric-strip';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
+import { BranchRequiredNotice } from '@/components/branch-required-notice';
 
 interface Branch {
   id: string;
@@ -80,6 +81,7 @@ export default function StockPage() {
 
   // Master Data
   const [branches, setBranches] = useState<Branch[]>([]);
+  const [branchesLoaded, setBranchesLoaded] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -131,6 +133,7 @@ export default function StockPage() {
       if (res.ok) {
         const activeBranches = (json.data || []).filter((b: Branch) => b.is_active);
         setBranches(activeBranches);
+        setBranchesLoaded(true);
         if (activeBranches.length > 0) {
           if (!fromBranchId) setFromBranchId(activeBranches[0].id);
           if (activeBranches.length > 1 && !toBranchId) setToBranchId(activeBranches[1].id);
@@ -508,6 +511,17 @@ export default function StockPage() {
       </div>
     );
   };
+
+  // Owner tanpa cabang: arahkan ke manajemen cabang dulu
+  if (branchesLoaded && branches.length === 0) {
+    return (
+      <RoleGuard allowedRoles={['OWNER']}>
+        <div className="space-y-6 pb-12">
+          <BranchRequiredNotice />
+        </div>
+      </RoleGuard>
+    );
+  }
 
   return (
     <RoleGuard allowedRoles={['OWNER']}>

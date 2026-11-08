@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { EmptyState } from '@/components/ui/empty-state';
+import { BranchRequiredNotice } from '@/components/branch-required-notice';
 import {
   buildErrorCsv,
   chunkRows,
@@ -42,6 +42,7 @@ export function MigrationWizard() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [dataType, setDataType] = useState<MigrationDataType>('PRODUCTS');
   const [branches, setBranches] = useState<Branch[]>([]);
+  const [branchesLoaded, setBranchesLoaded] = useState(false);
   const [branchId, setBranchId] = useState('');
   const [products, setProducts] = useState<ProductLite[]>([]);
   const [parsed, setParsed] = useState<ParsedImportFile | null>(null);
@@ -71,6 +72,8 @@ export function MigrationWizard() {
         }
       } catch {
         // Branch select will show empty; retry available via Refresh.
+      } finally {
+        setBranchesLoaded(true);
       }
     }
     void load();
@@ -217,6 +220,11 @@ export function MigrationWizard() {
     setResultSummary(null);
     setErrorMsg(null);
     setStep(1);
+  }
+
+  // Owner tanpa cabang: arahkan ke manajemen cabang dulu (guard utama, bukan suplemen)
+  if (branchesLoaded && branches.length === 0) {
+    return <BranchRequiredNotice />;
   }
 
   return (
@@ -500,15 +508,6 @@ export function MigrationWizard() {
             </>
           )}
         </div>
-      )}
-
-      {/* Empty guard */}
-      {branches.length === 0 && step === 1 && (
-        <EmptyState
-          icon={Package}
-          title="Belum ada cabang"
-          description="Buat cabang terlebih dahulu di menu Manajemen Organisasi sebelum melakukan migrasi data."
-        />
       )}
     </div>
   );

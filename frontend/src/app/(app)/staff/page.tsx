@@ -20,6 +20,7 @@ import { MetricStrip } from '@/components/ui/metric-strip';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatDateId } from '@/lib/date';
+import { BranchRequiredNotice } from '@/components/branch-required-notice';
 
 interface BranchOption {
   id: string;
@@ -47,6 +48,7 @@ interface CashierProfile {
 export default function StaffPage() {
   const [cashiers, setCashiers] = useState<CashierProfile[]>([]);
   const [branches, setBranches] = useState<BranchOption[]>([]);
+  const [branchesLoaded, setBranchesLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -102,6 +104,7 @@ export default function StaffPage() {
 
       setCashiers(cashierList);
       setBranches(branchList);
+      setBranchesLoaded(true);
 
       const activeBranches = branchList.filter((b) => b.is_active);
       if (activeBranches.length > 0) {
@@ -267,6 +270,17 @@ export default function StaffPage() {
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : 'Terjadi kesalahan jaringan.');
     }
+  }
+
+  // Owner tanpa cabang: arahkan ke manajemen cabang dulu
+  if (branchesLoaded && branches.length === 0) {
+    return (
+      <RoleGuard allowedRoles={['OWNER']}>
+        <div className="space-y-6 pb-12">
+          <BranchRequiredNotice />
+        </div>
+      </RoleGuard>
+    );
   }
 
   return (

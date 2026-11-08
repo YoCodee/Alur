@@ -20,6 +20,7 @@ import { MetricStrip } from '@/components/ui/metric-strip';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
+import { BranchRequiredNotice } from '@/components/branch-required-notice';
 
 interface Branch {
   id: string;
@@ -49,6 +50,7 @@ interface UserProfile {
 export default function ProductsPage() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [branches, setBranches] = useState<Branch[]>([]);
+  const [branchesLoaded, setBranchesLoaded] = useState(false);
   const [selectedBranchId, setSelectedBranchId] = useState<string>('');
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -92,6 +94,7 @@ export default function ProductsPage() {
         if (branchJson?.data) {
           const activeBranches: Branch[] = branchJson.data.filter((b: Branch) => b.is_active);
           setBranches(activeBranches);
+          setBranchesLoaded(true);
 
           // If cashier, lock to their assigned branch; otherwise pick first branch
           if (meJson?.data?.role === 'CASHIER' && meJson?.data?.branch_id) {
@@ -303,6 +306,15 @@ export default function ProductsPage() {
 
   const currentBranchName =
     branches.find((b) => b.id === selectedBranchId)?.name || 'Cabang Terpilih';
+
+  // Owner tanpa cabang: arahkan ke manajemen cabang dulu
+  if (branchesLoaded && branches.length === 0 && isOwner) {
+    return (
+      <div className="space-y-6 pb-12">
+        <BranchRequiredNotice />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
