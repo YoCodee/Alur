@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createBranchSchema } from '@/lib/validators/branches';
+import { releaseBranchName } from '@/lib/branches';
 import { apiSuccess, apiError, handleApiError } from '@/lib/api-response';
 
 export const dynamic = 'force-dynamic';
@@ -85,6 +86,9 @@ export async function POST(request: NextRequest) {
 
     const { name, location, daily_target } = result.data;
 
+    // Free the name if it is still held by an inactive branch with no data (see lib/branches)
+    const release = await releaseBranchName(supabase, profile.org_id, name);
+
     const { data: newBranch, error: insertError } = await supabase
       .from('branches')
       .insert({
@@ -100,6 +104,13 @@ export async function POST(request: NextRequest) {
     if (insertError) {
       if (insertError.code === '23505') {
         // Unique violation (org_id, name)
+        if (release === 'held-by-history') {
+          return apiError(
+            'CONFLICT',
+            `Nama "${name}" masih dipakai cabang nonaktif yang masih memiliki data terkait.`,
+            409
+          );
+        }
         return apiError('CONFLICT', `Cabang dengan nama "${name}" sudah ada.`, 409);
       }
       return handleApiError(insertError);

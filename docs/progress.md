@@ -2338,3 +2338,17 @@
 - `frontend/src/components/import/migration-wizard.tsx` — guard lama yang hanya suplemen di bawah form diganti early return notice (form tidak dirender sama sekali); empty-state lama tanpa CTA dihapus.
 
 **Verifikasi E2E (Chrome headless CDP):** user baru tanpa cabang → notice + CTA tampil di keenam halaman, klik CTA di `/expenses` navigasi ke `/branches` (7 pass, 0 fail, konsol bersih); user dengan cabang → notice tidak muncul di keenam halaman (6 pass). `npm run typecheck` lulus; `npm run lint` lulus dengan 1 warning font lama di `src/app/layout.tsx`; `npm run test` lulus (21 file, 192 tes).
+
+## Perbaikan Bug Nama Cabang "Sudah Ada" Setelah Dihapus (8 Nov 2026)
+
+**Masalah:** user menghapus cabang "Jogja", cabangnya hilang dari daftar, tetapi membuat cabang "Jogja" baru selalu ditolak dengan `409 Cabang dengan nama "Jogja" sudah ada.`
+
+**Akar masalah:** "hapus" selalu berupa soft delete (`is_active = false`) — barisnya tetap ada di tabel `branches`, sedangkan constraint `unique (org_id, name)` di `database/schema.sql` berlaku untuk semua baris termasuk yang nonaktif, jadi nama itu permanen tertahan. Halaman cabang hanya memuat `/api/branches` (filter aktif), sehingga baris nonaktif tidak pernah terlihat oleh user. Komentar `database/rls.sql` ("allow hard delete if no transactions") dan PRD D9 (soft delete hanya untuk cabang yang sudah punya transaksi) menunjukkan niat awalnya memang hard delete bila tanpa data, tetapi implementasinya tidak pernah melakukannya.
+
+**Perbaikan:**
+- `frontend/src/app/api/branches/[id]/route.ts` — `DELETE` kini mencoba hard delete dulu; bila ditahan FK (`23503`) atau karyawan masih menempel (cek profil `23514`) jatuh ke soft delete seperti sebelumnya, dengan pesan yang jujur ("berhasil dihapus" vs "masih memiliki data, sehingga hanya dinonaktifkan").
+- `frontend/src/lib/branches.ts` (baru) — helper `releaseBranchName`: saat `POST`/`PATCH` kena `23505`, bebaskan baris nonaktif yang tidak punya data terkait lalu lanjut; baris berriwayat tetap dipertahankan agar laporan utuh dan user diberi pesan "nama masih dipakai cabang nonaktif yang masih memiliki data terkait".
+- `frontend/src/app/api/branches/route.ts`, `frontend/src/app/api/branches/[id]/route.ts` — memanggil helper itu sebelum insert/rename; pesan 409 dibedakan antara "nama dipakai cabang aktif" dan "dipakai baris nonaktif berriwayat".
+- `frontend/src/app/(app)/branches/page.tsx` — daftar kini memuat `/api/branches?all=true` supaya baris nonaktif ikut terlihat (badge "Nonaktif" sudah ada di kartu); teks modal konfirmasi ("Hapus Cabang?" / "Ya, Hapus") dan pesan sukses disesuaikan dengan perilaku baru.
+
+**Verifikasi:** test baru `frontend/tests/api/branches-name-reuse.test.ts` (9 tes) — rilis nama dari baris nonaktif tanpa data di `POST` & `PATCH`, penolakan tetap untuk baris aktif/berriwayat, hard delete vs fallback soft delete, 404 bila cabang tidak ada, dan rename ke namanya sendiri tidak menghapus dirinya sendiri. E2E Chrome headless CDP (user baru): buat "Jogja Uji" → hapus (200, "berhasil dihapus", daftar aktif kosong) → buat ulang nama sama → 201 (bug teratasi), kartu tampil di `/branches`, modal teks baru, hapus lewat UI sukses (7 pass, 0 fail, konsol bersih). Baris "Jogja" milik user asli (nonaktif, nol data terkait) ikut dibersihkan sehingga namanya langsung bebas. `npm run typecheck` lulus; `npm run lint` lulus dengan 1 warning font lama di `src/app/layout.tsx`; `npm run test` lulus (22 file, 201 tes).

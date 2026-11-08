@@ -55,7 +55,9 @@ export default function BranchesPage() {
     setLoading(true);
     setErrorMsg(null);
     try {
-      const res = await fetch('/api/branches');
+      // all=true: inactive branches stay visible so users can see which one still
+      // holds a name (see lib/branches) — the "Nonaktif" badge already exists on the card
+      const res = await fetch('/api/branches?all=true');
       const json = await res.json();
       if (!res.ok) {
         throw new Error(json?.error?.message || 'Gagal memuat cabang.');
@@ -154,9 +156,11 @@ export default function BranchesPage() {
       });
       const json = await res.json();
       if (!res.ok) {
-        throw new Error(json?.error?.message || 'Gagal menonaktifkan cabang.');
+        throw new Error(json?.error?.message || 'Gagal menghapus cabang.');
       }
-      setSuccessMsg(`Cabang "${deletingBranch.name}" berhasil dinonaktifkan.`);
+      setSuccessMsg(
+        json?.data?.message || `Cabang "${deletingBranch.name}" berhasil dihapus.`
+      );
       setDeletingBranch(null);
       loadBranches();
     } catch (err) {
@@ -352,7 +356,7 @@ export default function BranchesPage() {
                     size="sm"
                     onClick={() => setDeletingBranch(b)}
                     className="h-8 w-8 p-0 text-slate-500 hover:text-rose-600 hover:bg-rose-50"
-                    title="Nonaktifkan Cabang"
+                    title="Hapus Cabang"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </Button>
@@ -472,7 +476,7 @@ export default function BranchesPage() {
                   <Trash2 className="w-4 h-4 text-rose-600" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold">Nonaktifkan Cabang?</h3>
+                  <h3 className="text-sm font-bold">Hapus Cabang?</h3>
                   <p className="text-[11px] text-rose-600 font-mono">
                     {deletingBranch.name}
                   </p>
@@ -481,7 +485,11 @@ export default function BranchesPage() {
 
               <div className="p-5 space-y-4">
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Cabang <strong className="text-slate-900">&quot;{deletingBranch.name}&quot;</strong> akan dinonaktifkan dan tidak dapat dipilih untuk transaksi baru. Riwayat transaksi tetap tersimpan.
+                  Cabang <strong className="text-slate-900">&quot;{deletingBranch.name}&quot;</strong>{' '}
+                  {deletingBranch.is_active
+                    ? 'akan dihapus dan namanya bisa dipakai lagi. '
+                    : 'akan dinonaktifkan. '}
+                  Cabang yang sudah punya transaksi hanya dinonaktifkan agar riwayat laporan tetap utuh.
                 </p>
 
                 <div className="flex items-center justify-end gap-2.5 pt-2">
@@ -501,7 +509,7 @@ export default function BranchesPage() {
                     className="flex items-center gap-1.5"
                   >
                     {submitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                    Ya, Nonaktifkan
+                    Ya, Hapus
                   </Button>
                 </div>
               </div>
