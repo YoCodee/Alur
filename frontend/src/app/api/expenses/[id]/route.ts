@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { updateExpenseSchema } from '@/lib/validators/expenses';
 import { apiSuccess, apiError, handleApiError } from '@/lib/api-response';
+import { detectExpenseSpike } from '@/lib/anomaly/anomaly-detector';
 
 export async function PATCH(
   request: NextRequest,
@@ -41,7 +42,7 @@ export async function PATCH(
       // Get current expense for branch & org
       const { data: currentExp } = await supabase
         .from('expenses')
-        .select('org_id, branch_id, category, amount')
+        .select('org_id, branch_id, category, amount, description')
         .eq('id', expenseId)
         .single();
 
@@ -51,40 +52,31 @@ export async function PATCH(
 
         const { data: pastExpenses } = await supabase
           .from('expenses')
-          .select('amount, category')
+          .select('amount, category, description')
           .eq('org_id', currentExp.org_id)
           .neq('id', expenseId)
           .limit(100);
 
-        const histList = pastExpenses || [];
-        const sameCategory = histList.filter((e) => e.category === cat);
-        const benchmarkList = sameCategory.length > 0 ? sameCategory : histList;
+        // Baseline per kategori lewat detector yang sama dengan POST /api/expenses
+        // (fallback ke rata-rata lintas kategori = bug gaji 40x).
+        const spike = detectExpenseSpike(
+          {
+            amount: Number(amt),
+            category: cat,
+            description: parsed.data.description || currentExp.description || '',
+            branch_id: currentExp.branch_id,
+          },
+          (pastExpenses || []).map((e) => ({ amount: Number(e.amount), category: e.category }))
+        );
 
-        let isAnomaly = false;
-        let anomalyScore = 0;
-        let anomalyReason: string | null = null;
-
-        if (benchmarkList.length > 0) {
-          const amounts = benchmarkList.map((e) => Number(e.amount));
-          const benchmarkMean = amounts.reduce((a, b) => a + b, 0) / amounts.length;
-          const minThresholdFloor = 50000;
-          const multiplier = 3.0;
-          const threshold = Math.max(minThresholdFloor, benchmarkMean * multiplier);
-
-          if (amt > threshold) {
-            isAnomaly = true;
-            const ratio = benchmarkMean > 0 ? (amt / benchmarkMean).toFixed(1) : '3.0';
-            const sumSquares = amounts.reduce((acc, v) => acc + Math.pow(v - benchmarkMean, 2), 0);
-            const stdDev = amounts.length > 1 ? Math.sqrt(sumSquares / (amounts.length - 1)) : benchmarkMean * 0.3;
-            const zScore = stdDev > 0 ? (amt - benchmarkMean) / stdDev : 3.5;
-            anomalyScore = Math.min(99.99, Math.round(zScore * 100) / 100);
-            anomalyReason = `Rp ${Number(amt).toLocaleString('id-ID')}, sekitar ${ratio}x dari rata-rata biasanya (Rp ${Math.round(benchmarkMean).toLocaleString('id-ID')}) untuk kategori ${cat}.`;
-          }
-        }
-
-        updatePayload.is_anomaly = isAnomaly;
-        updatePayload.anomaly_score = anomalyScore;
-        updatePayload.anomaly_reason = anomalyReason;
+        updatePayload.is_anomaly = spike !== null;
+        // z = 0 hanya bila stdDev 0 → pakai fallback 3.5 seperti logika lama
+        updatePayload.anomaly_score = spike ? Math.min(99.99, spike.z_score || 3.5) : 0;
+        updatePayload.anomaly_reason = spike
+          ? `Rp ${Number(amt).toLocaleString('id-ID')}, sekitar ${(
+              Number(amt) / (spike.baseline_value || 1)
+            ).toFixed(1)}x dari rata-rata biasanya (Rp ${spike.baseline_value.toLocaleString('id-ID')}) untuk kategori ${cat}.`
+          : null;
       }
     }
 

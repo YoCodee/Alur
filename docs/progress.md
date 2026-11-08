@@ -2339,6 +2339,19 @@
 
 **Verifikasi E2E (Chrome headless CDP):** user baru tanpa cabang → notice + CTA tampil di keenam halaman, klik CTA di `/expenses` navigasi ke `/branches` (7 pass, 0 fail, konsol bersih); user dengan cabang → notice tidak muncul di keenam halaman (6 pass). `npm run typecheck` lulus; `npm run lint` lulus dengan 1 warning font lama di `src/app/layout.tsx`; `npm run test` lulus (21 file, 192 tes).
 
+## Perbaikan Anomali Pengeluaran: Baseline per Kategori (8 Nov 2026)
+
+**Masalah:** user mencatat pengeluaran transportasi Rp 50.000 lalu gaji Rp 2.000.000; sistem menandai gaji sebagai anomali "40x rata-rata 50.000" di dashboard, padahal gaji wajar untuk kategorinya.
+
+**Akar masalah:** logika deteksi waktu-tulis di `POST /api/expenses` (dan duplikasinya di `PATCH /api/expenses/[id]`) memakai fallback `sameCategory.length > 0 ? sameCategory : histList` — saat kategori belum punya riwayat, baseline jatuh ke rata-rata **seluruh** pengeluaran lintas kategori, dan tanpa guard minimal sampel. Detector murni (`detectExpenseSpike`) sudah benar (per kategori, min. 3 sampel), tetapi jalur write-time tidak memakainya.
+
+**Perbaikan:**
+- `frontend/src/app/api/expenses/route.ts` — logika skor anomali duplikasi diganti panggilan `detectExpenseSpike` (baseline per kategori, guard ≥3 sampel, floor Rp 50.000, threshold `>` sama); judul/deskripsi/saran `ml_recommendations` kini memakai field hasil detector; `anomaly_score` tetap memakai fallback z=3.5 saat stdDev 0 seperti sebelumnya.
+- `frontend/src/app/api/expenses/[id]/route.ts` — duplikasi sama diganti panggilan detector yang sama; `description` ditambahkan ke select saat recalc.
+- Tidak ada perubahan pada `frontend/src/lib/anomaly/anomaly-detector.ts`, `frontend/src/app/api/anomalies/route.ts` (deteksi on-demand sudah per kategori), dan `anomaly-cache.ts`.
+
+**Verifikasi:** test baru `frontend/tests/api/expenses-anomaly-write.test.ts` (5 tes) — reproduksi gagal dulu: gaji 2.000.000 vs riwayat transport 50.000 terdeteksi anomali di POST & PATCH, lalu lulus setelah fix; gaji 40x rata-rata gaji sendiri dan transport 40x rata-rata transport sendiri tetap terdeteksi; gaji yang baru muncul 1x tidak jadi anomali palsu. Ditambah 3 tes kontrak per kategori di `tests/lib/anomaly-detector.test.ts`. `npm run typecheck` lulus; `npm run lint` lulus dengan 1 warning font lama di `src/app/layout.tsx`; `npm run test` lulus — 21 file / 192 tes saat perbaikan ini, 22 file / 201 tes setelah seluruh perubahan ter-commit.
+
 ## Perbaikan Bug Nama Cabang "Sudah Ada" Setelah Dihapus (8 Nov 2026)
 
 **Masalah:** user menghapus cabang "Jogja", cabangnya hilang dari daftar, tetapi membuat cabang "Jogja" baru selalu ditolak dengan `409 Cabang dengan nama "Jogja" sudah ada.`

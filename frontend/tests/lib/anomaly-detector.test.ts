@@ -225,6 +225,144 @@ describe('detectDuplicateTransactions', () => {
   });
 });
 
+describe('detectExpenseSpike — batas severity & opsi', () => {
+  const history = [
+    { amount: 40000, category: 'Gaji' },
+    { amount: 160000, category: 'Gaji' },
+    { amount: 60000, category: 'Gaji' },
+    { amount: 140000, category: 'Gaji' },
+  ]; // mean = 100.000, std dev ≈ 58.878
+
+  it('menandai HIGH saat rasio < 5x tetapi z-score > 3', () => {
+    const anomaly = detectExpenseSpike(
+      { id: 'exp-h', amount: 330000, category: 'Gaji', description: 'Tunjangan mendadak', branch_id: 'b1' },
+      history
+    );
+    // 3,3x mean (lolos threshold 300.000) tapi belum 5x; z ≈ 3,9 → HIGH, bukan CRITICAL
+    expect(anomaly?.severity).toBe('HIGH');
+  });
+
+  it('tidak menandai saat nominal tepat sama dengan threshold (harus >, bukan >=)', () => {
+    const flat = [
+      { amount: 50000, category: 'Utilitas' },
+      { amount: 45000, category: 'Utilitas' },
+      { amount: 55000, category: 'Utilitas' },
+      { amount: 50000, category: 'Utilitas' },
+    ]; // mean 50.000 → threshold max(50.000, 150.000) = 150.000
+    const anomaly = detectExpenseSpike(
+      { amount: 150000, category: 'Utilitas', description: 'Tepat di batas', branch_id: 'b1' },
+      flat
+    );
+    expect(anomaly).toBeNull();
+  });
+
+  it('memakai expense_date sebagai detected_at bila disediakan', () => {
+    const anomaly = detectExpenseSpike(
+      {
+        id: 'exp-d',
+        amount: 330000,
+        category: 'Gaji',
+        description: 'Bayar lembur',
+        branch_id: 'b1',
+        expense_date: '2026-10-20',
+      },
+      history
+    );
+    expect(anomaly?.detected_at).toBe('2026-10-20');
+  });
+});
+
+describe('detectRevenueAnomalies — floor stdDev, opsi & severity', () => {
+  it('omzet konstan dengan satu hari jatuh tetap terdeteksi (floor stdDev 5% mean)', () => {
+    const days = Array.from({ length: 7 }, (_, i) => ({
+      date: `2026-10-0${i + 1}`,
+      revenue: 2000000,
+      branch_id: 'b1',
+    }));
+    days.push({ date: '2026-10-08', revenue: 1000000, branch_id: 'b1' }); // std dev = 0
+
+    const anomalies = detectRevenueAnomalies(days);
+    expect(anomalies.length).toBe(1);
+    expect(anomalies[0].anomaly_type).toBe('REVENUE_DROP');
+    expect(anomalies[0].severity).toBe('CRITICAL'); // z ≈ -10
+  });
+
+  it('lonjakan dengan z di rentang 2,5–3,5 berseverity MEDIUM', () => {
+    const days = [
+      { date: '2026-10-01', revenue: 2000000, branch_id: 'b1' },
+      { date: '2026-10-02', revenue: 2100000, branch_id: 'b1' },
+      { date: '2026-10-03', revenue: 1900000, branch_id: 'b1' },
+      { date: '2026-10-04', revenue: 2050000, branch_id: 'b1' },
+      { date: '2026-10-05', revenue: 1950000, branch_id: 'b1' },
+      { date: '2026-10-06', revenue: 2000000, branch_id: 'b1' },
+      { date: '2026-10-07', revenue: 2020000, branch_id: 'b1' },
+      { date: '2026-10-08', revenue: 2300000, branch_id: 'b1' }, // z ≈ 3,0 (floor stdDev 5% mean aktif)
+    ];
+
+    const anomalies = detectRevenueAnomalies(days);
+    expect(anomalies.length).toBe(1);
+    expect(anomalies[0].anomaly_type).toBe('REVENUE_SURGE');
+    expect(anomalies[0].severity).toBe('MEDIUM');
+  });
+
+  it('menghormati opsi minDays kustom', () => {
+    const days = Array.from({ length: 8 }, (_, i) => ({
+      date: `2026-10-0${i + 1}`,
+      revenue: i === 7 ? 500000 : 2000000,
+      branch_id: 'b1',
+    }));
+    expect(detectRevenueAnomalies(days, { minDays: 10 })).toEqual([]);
+    expect(detectRevenueAnomalies(days, { minDays: 10 }).length).toBe(0);
+  });
+});
+
+describe('detectDuplicateTransactions — batas aturan', () => {
+  const base = {
+    total_revenue: 55000,
+    payment_method: 'CASH',
+    created_at: '2026-10-19T10:00:00Z',
+  };
+
+  it('mengabaikan pasangan beda cabang walau nominal & waktu identik', () => {
+    const txs = [
+      { id: 'tx-a', branch_id: 'b1', ...base },
+      { id: 'tx-b', branch_id: 'b2', ...base, created_at: '2026-10-19T10:00:15Z' },
+    ];
+    expect(detectDuplicateTransactions(txs)).toEqual([]);
+  });
+
+  it('mengabaikan pasangan beda metode bayar', () => {
+    const txs = [
+      { id: 'tx-a', branch_id: 'b1', ...base },
+      { id: 'tx-b', branch_id: 'b1', ...base, payment_method: 'QRIS', created_at: '2026-10-19T10:00:15Z' },
+    ];
+    expect(detectDuplicateTransactions(txs)).toEqual([]);
+  });
+
+  it('tetap mendeteksi walau input tidak terurut waktu', () => {
+    const txs = [
+      { id: 'tx-later', branch_id: 'b1', ...base, created_at: '2026-10-19T10:00:20Z' },
+      { id: 'tx-earlier', branch_id: 'b1', ...base, created_at: '2026-10-19T10:00:00Z' },
+    ];
+    const anomalies = detectDuplicateTransactions(txs, 60);
+    expect(anomalies.length).toBe(1);
+    expect(anomalies[0].entity_id).toBe('tx-later'); // selalu transaksi kedua (berurutan waktu)
+  });
+});
+
+describe('detectCashDiscrepancy — toleransi kustom', () => {
+  it('menghormati parameter toleransi persentase', () => {
+    // Selisih 30.000: ditolak dengan toleransi bawaan 2% (batas 20.000)...
+    expect(detectCashDiscrepancy(1000000, 1030000, 'b1')).not.toBeNull();
+    // ...tapi diterima bila toleransi dilonggarkan ke 5% (batas 50.000)
+    expect(detectCashDiscrepancy(1000000, 1030000, 'b1', 'Kasir A', 0.05)).toBeNull();
+  });
+
+  it('selisih tepat sebesar batas toleransi tidak dianggap anomali (harus >)', () => {
+    expect(detectCashDiscrepancy(1000000, 1020000, 'b1')).toBeNull();
+  });
+});
+
 describe('detectCashDiscrepancy', () => {
   it('detects cash shortage and surplus beyond tolerance', () => {
     // Expected: 1.000.000, Actual: 850.000 (Shortage of 150.000 > tolerance of 20.000)
@@ -244,5 +382,48 @@ describe('detectCashDiscrepancy', () => {
     // Expected: 1.000.000, Actual: 1.005.000 (difference 5.000 <= 10.000 tolerance floor)
     const ok = detectCashDiscrepancy(1000000, 1005000, 'b1');
     expect(ok).toBeNull();
+  });
+});
+
+describe('detectExpenseSpike — baseline per kategori (bukan lintas kategori)', () => {
+  const transportHistory = [
+    { amount: 50000, category: 'Transportasi' },
+    { amount: 50000, category: 'Transportasi' },
+    { amount: 48000, category: 'Transportasi' },
+    { amount: 52000, category: 'Transportasi' },
+  ]; // mean transport = 50.000
+
+  it('gaji Rp 2.000.000 tidak jadi anomali hanya karena transport Rp 50.000 ada di riwayat', () => {
+    // Kasus user: baseline lintas kategori membuat gaji terbaca "40x rata-rata 50.000"
+    const anomaly = detectExpenseSpike(
+      { amount: 2000000, category: 'Gaji', description: 'Gaji karyawan', branch_id: 'b1' },
+      transportHistory
+    );
+    expect(anomaly).toBeNull();
+  });
+
+  it('gaji 40x rata-rata gaji sendiri tetap terdeteksi', () => {
+    const gajiHistory = [
+      { amount: 50000, category: 'Gaji' },
+      { amount: 50000, category: 'Gaji' },
+      { amount: 48000, category: 'Gaji' },
+      { amount: 52000, category: 'Gaji' },
+    ];
+    const anomaly = detectExpenseSpike(
+      { amount: 2000000, category: 'Gaji', description: 'Gaji karyawan', branch_id: 'b1' },
+      gajiHistory
+    );
+    expect(anomaly).not.toBeNull();
+    expect(anomaly?.baseline_value).toBe(50000);
+    expect(anomaly?.title).toContain('40.0x Rata-rata');
+  });
+
+  it('transportasi 40x rata-rata transportasi sendiri tetap terdeteksi', () => {
+    const anomaly = detectExpenseSpike(
+      { amount: 2000000, category: 'Transportasi', description: 'Sewa truk', branch_id: 'b1' },
+      transportHistory
+    );
+    expect(anomaly).not.toBeNull();
+    expect(anomaly?.baseline_value).toBe(50000);
   });
 });
