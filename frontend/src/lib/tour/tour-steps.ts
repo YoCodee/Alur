@@ -175,17 +175,6 @@ export function getTourSteps(options: TourOptions): DriveStep[] {
     });
 
     steps.push({
-      element: '#tour-dashboard-tabs',
-      popover: {
-        title: '🗂️ Navigasi Tab Fokus',
-        description:
-          'Pilih sudut pandang: 3 Pertanyaan Pagi (analisis cepat), Performa Cabang (monitoring gerai), atau Perlu Dicek (tinjauan anomali).',
-        side: 'bottom',
-        align: 'start',
-      },
-    });
-
-    steps.push({
       element: '#tour-metric-strip',
       popover: {
         title: '📊 4 Pertanyaan Kunci Pagi Hari',
@@ -230,11 +219,11 @@ export function getTourSteps(options: TourOptions): DriveStep[] {
     });
 
     steps.push({
-      element: '#tour-target-card',
+      element: '#tour-performance-card',
       popover: {
-        title: '🎯 Target Penjualan Hari Ini',
+        title: '🏬 Performa Cabang',
         description:
-          'Progress bar real-time pencapaian target penjualan untuk setiap cabang aktif (warna hijau bila di atas 90%).',
+          'Pencapaian target penjualan, jumlah transaksi, dan kesehatan stok tiap cabang aktif, plus tautan cepat ke manajemen cabang.',
         side: 'left',
         align: 'start',
       },

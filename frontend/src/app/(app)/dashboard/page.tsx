@@ -20,7 +20,6 @@ import { formatDateId } from '@/lib/date';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tabs } from '@/components/ui/tabs';
 import { EmptyState } from '@/components/ui/empty-state';
 import { SectionHeader } from '@/components/ui/section-header';
 import { StatCard, type StatTone } from '@/components/ui/stat-card';
@@ -42,7 +41,6 @@ import {
   Volume2,
   TrendingUp,
   Wallet,
-  Target,
   ShieldCheck,
   FileText,
 } from 'lucide-react';
@@ -187,7 +185,6 @@ function TrendTooltip({
 }
 
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState<'overview' | 'branches' | 'anomalies'>('overview');
   const [anomalies, setAnomalies] = useState<AnomalyItem[]>([]);
   const [anomalySummary, setAnomalySummary] = useState<{
     total_open: number;
@@ -551,26 +548,7 @@ export default function DashboardPage() {
           </Link>
         )}
 
-                {/* ======================================================== */}
-        {/* 3. SEGMENTED TABS SWITCHER (refrence1 (4).png) */}
-
-        {/* ======================================================== */}
-        {/* TABS */}
-        {/* ======================================================== */}
-        <div id="tour-dashboard-tabs">
-          <Tabs
-            variant="underline"
-            className="w-full"
-            activeId={activeTab}
-            onChange={(id) => setActiveTab(id as 'overview' | 'branches' | 'anomalies')}
-            items={[
-              { id: 'overview', label: '3 pertanyaan pagi', icon: Sparkles },
-              { id: 'branches', label: 'Performa cabang', icon: Building2, count: branchList.length },
-              { id: 'anomalies', label: 'Perlu dicek', icon: ShieldAlert, count: anomalySummary.total_open },
-            ]}
-          />
-        </div>
-
+        
         {/* ======================================================== */}
         {/* RINGKASAN ANGKA */}
         {/* ======================================================== */}
@@ -597,402 +575,371 @@ export default function DashboardPage() {
         {/* ======================================================== */}
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
           <div className="space-y-6 lg:col-span-8">
-            {activeTab !== 'branches' && (
-              <>
-                {/* APA YANG PERLU DIPERHATIKAN */}
-                <Card id="tour-anomaly-card" className="overflow-hidden">
-                  <SectionHeader
-                    icon={ShieldAlert}
-                    tone="warning"
-                    title="Apa yang perlu diperhatikan?"
-                    description="Pengeluaran dan transaksi yang tidak biasa, diurutkan dari yang paling mendesak."
-                    actions={
-                      <Badge variant={anomalySummary.total_open > 0 ? 'warning' : 'success'}>
-                        {anomalySummary.total_open > 0
-                          ? `${anomalySummary.total_open} perlu dicek`
-                          : 'Semua normal'}
-                      </Badge>
-                    }
-                  />
+            {/* APA YANG PERLU DIPERHATIKAN */}
+            <Card id="tour-anomaly-card" className="overflow-hidden">
+              <SectionHeader
+                icon={ShieldAlert}
+                tone="warning"
+                title="Apa yang perlu diperhatikan?"
+                description="Pengeluaran dan transaksi yang tidak biasa, diurutkan dari yang paling mendesak."
+                actions={
+                  <Badge variant={anomalySummary.total_open > 0 ? 'warning' : 'success'}>
+                    {anomalySummary.total_open > 0
+                      ? `${anomalySummary.total_open} perlu dicek`
+                      : 'Semua normal'}
+                  </Badge>
+                }
+              />
 
-                  <CardContent className="p-0">
-                    {loading && anomalies.length === 0 ? (
-                      <div className="space-y-3 p-5 sm:p-6">
-                        {[0, 1, 2].map((i) => (
-                          <div key={i} className="h-16 animate-pulse rounded-lg bg-stone-100" />
-                        ))}
-                      </div>
-                    ) : anomalies.length === 0 ? (
-                      <div className="p-5 sm:p-6">
-                        <EmptyState
-                          icon={CheckCircle2}
-                          title="Tidak ada yang mencurigakan"
-                          description="Tidak ditemukan lonjakan biaya, selisih kas, atau transaksi yang perlu ditinjau. Usaha Anda dalam kondisi baik."
-                        />
-                      </div>
-                    ) : (
-                      <ul className="divide-y divide-stone-100">
-                        {anomalies.map((anom) => {
-                          const meta = severityMeta[anom.severity] ?? severityMeta.MEDIUM;
-                          return (
-                            <li key={anom.id} className="px-5 py-4 sm:px-6">
-                              <div className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
-                                <div className="flex min-w-0 gap-3">
-                                  <span
-                                    aria-hidden="true"
-                                    className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${meta.dot}`}
-                                  />
-                                  <div className="min-w-0">
-                                    <div className="flex flex-wrap items-center gap-2">
-                                      <p className="text-sm font-medium leading-snug text-stone-900">
-                                        {anom.title}
-                                      </p>
-                                      <Badge variant={meta.badge}>{meta.label}</Badge>
-                                    </div>
-                                    <p className="mt-1 text-sm leading-relaxed text-stone-600">
-                                      {cleanAnomalyDescription(anom.description)}
-                                    </p>
-                                    <p className="mt-2 text-xs text-stone-400">
-                                      {anom.branch_name || 'Seluruh cabang'} ·{' '}
-                                      {formatDateId(anom.detected_at, 'd MMM, HH:mm')}
-                                    </p>
-                                  </div>
+              <CardContent className="p-0">
+                {loading && anomalies.length === 0 ? (
+                  <div className="space-y-3 p-5 sm:p-6">
+                    {[0, 1, 2].map((i) => (
+                      <div key={i} className="h-16 animate-pulse rounded-lg bg-stone-100" />
+                    ))}
+                  </div>
+                ) : anomalies.length === 0 ? (
+                  <div className="p-5 sm:p-6">
+                    <EmptyState
+                      icon={CheckCircle2}
+                      title="Tidak ada yang mencurigakan"
+                      description="Tidak ditemukan lonjakan biaya, selisih kas, atau transaksi yang perlu ditinjau. Usaha Anda dalam kondisi baik."
+                    />
+                  </div>
+                ) : (
+                  <ul className="divide-y divide-stone-100">
+                    {anomalies.map((anom) => {
+                      const meta = severityMeta[anom.severity] ?? severityMeta.MEDIUM;
+                      return (
+                        <li key={anom.id} className="px-5 py-4 sm:px-6">
+                          <div className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
+                            <div className="flex min-w-0 gap-3">
+                              <span
+                                aria-hidden="true"
+                                className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${meta.dot}`}
+                              />
+                              <div className="min-w-0">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <p className="text-sm font-medium leading-snug text-stone-900">
+                                    {anom.title}
+                                  </p>
+                                  <Badge variant={meta.badge}>{meta.label}</Badge>
                                 </div>
-
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => setSelectedAnomaly(anom)}
-                                  className="shrink-0 justify-self-end"
-                                >
-                                  Tinjau
-                                </Button>
+                                <p className="mt-1 text-sm leading-relaxed text-stone-600">
+                                  {cleanAnomalyDescription(anom.description)}
+                                </p>
+                                <p className="mt-2 text-xs text-stone-400">
+                                  {anom.branch_name || 'Seluruh cabang'} ·{' '}
+                                  {formatDateId(anom.detected_at, 'd MMM, HH:mm')}
+                                </p>
                               </div>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* APA YANG PERLU DILAKUKAN */}
-                <Card id="tour-transfer-card" className="overflow-hidden">
-                  <SectionHeader
-                    icon={ArrowRightLeft}
-                    tone="info"
-                    title="Apa yang perlu dilakukan?"
-                    description="Mutasi stok antarcabang untuk mencegah kehabisan di gerai yang ramai."
-                    actions={
-                      recommendations.length > 0 ? (
-                        <Badge variant="intelligence">
-                          {recommendations.length} saran
-                        </Badge>
-                      ) : undefined
-                    }
-                  />
-
-                  <CardContent className="space-y-3 p-5 sm:p-6">
-                    {loading && recommendations.length === 0 ? (
-                      <div className="space-y-3">
-                        {[0, 1].map((i) => (
-                          <div key={i} className="h-40 animate-pulse rounded-xl bg-stone-100" />
-                        ))}
-                      </div>
-                    ) : recommendations.length === 0 ? (
-                      <EmptyState
-                        icon={PackageCheck}
-                        title="Persediaan dalam kondisi prima"
-                        description="Stok seluruh gerai masih dalam batas aman. Belum ada mutasi yang perlu dilakukan hari ini."
-                      />
-                    ) : (
-                      <>
-                        {recommendations.slice(0, 2).map((rec) => (
-                        <div
-                          key={rec.id}
-                          className="rounded-xl border border-stone-200/80 bg-white p-4 sm:p-5"
-                        >
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="min-w-0">
-                              <p className="truncate text-sm font-medium text-stone-900">
-                                {rec.product_name}
-                              </p>
-                              <p className="mt-0.5 font-mono text-xs text-stone-400">
-                                {rec.sku}
-                              </p>
                             </div>
-                            <Badge
-                              variant={rec.urgency === 'CRITICAL' ? 'danger' : 'intelligence'}
-                            >
-                              {rec.urgency === 'CRITICAL' ? 'Mendesak' : 'Disarankan'}
-                            </Badge>
-                          </div>
-
-                          <div className="mt-4 grid grid-cols-[1fr_auto_1fr] items-center gap-2 rounded-lg bg-stone-50/80 px-3 py-3 ring-1 ring-inset ring-stone-200/60">
-                            <div className="min-w-0">
-                              <p className="text-[11px] text-stone-400">Dari</p>
-                              <p className="truncate text-sm font-medium text-stone-800">
-                                {rec.from_branch_name}
-                              </p>
-                              <p className="mt-0.5 text-xs tabular-nums text-stone-500">
-                                {rec.from_current_stock} → {rec.from_stock_after} unit
-                              </p>
-                            </div>
-
-                            <div className="flex flex-col items-center gap-1 text-sage-600">
-                              <span className="rounded-full bg-sage-50 px-2 py-0.5 text-xs font-medium tabular-nums">
-                                +{rec.transfer_qty}
-                              </span>
-                              <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-                            </div>
-
-                            <div className="min-w-0 text-right">
-                              <p className="text-[11px] text-stone-400">Ke</p>
-                              <p className="truncate text-sm font-medium text-stone-800">
-                                {rec.to_branch_name}
-                              </p>
-                              <p className="mt-0.5 text-xs tabular-nums text-stone-500">
-                                {rec.to_current_stock} →{' '}
-                                <span className="font-medium text-emerald-700">
-                                  {rec.to_stock_after}
-                                </span>{' '}
-                                unit
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                            <p className="text-xs leading-relaxed text-stone-500">
-                              Potensi hemat{' '}
-                              <span className="font-medium text-emerald-700">
-                                {formatRupiah(rec.net_benefit)}
-                              </span>{' '}
-                              · cukup untuk ±{rec.to_days_of_supply_after} hari
-                            </p>
 
                             <Button
-                              variant="primary"
+                              variant="outline"
                               size="sm"
-                              disabled={executingId === rec.id}
-                              onClick={() => handleExecuteTransfer(rec)}
-                              className="w-full shrink-0 sm:w-auto"
+                              onClick={() => setSelectedAnomaly(anom)}
+                              className="shrink-0 justify-self-end"
                             >
-                              {executingId === rec.id ? (
-                                <>
-                                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                  <span>Memproses...</span>
-                                </>
-                              ) : (
-                                <>
-                                  <Check className="h-3.5 w-3.5" />
-                                  <span>Pindahkan {rec.transfer_qty} unit</span>
-                                </>
-                              )}
+                              Tinjau
                             </Button>
                           </div>
-                        </div>
-                      ))}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </CardContent>
+            </Card>
 
-                        {recommendations.length > 2 && (
-                          <Button
-                            asChild
-                            variant="ghost"
-                            size="sm"
-                            className="w-full text-stone-600"
-                          >
-                            <Link href="/stock">
-                              <span>
-                                Lihat {recommendations.length - 2} saran lainnya
-                              </span>
-                              <ArrowRight className="h-3.5 w-3.5" />
-                            </Link>
-                          </Button>
-                        )}
-                      </>
-                    )}
-                  </CardContent>
-                </Card>
+            {/* APA YANG PERLU DILAKUKAN */}
+            <Card id="tour-transfer-card" className="overflow-hidden">
+              <SectionHeader
+                icon={ArrowRightLeft}
+                tone="info"
+                title="Apa yang perlu dilakukan?"
+                description="Mutasi stok antarcabang untuk mencegah kehabisan di gerai yang ramai."
+                actions={
+                  recommendations.length > 0 ? (
+                    <Badge variant="intelligence">
+                      {recommendations.length} saran
+                    </Badge>
+                  ) : undefined
+                }
+              />
 
-                {/* TREN FINANSIAL */}
-                <Card id="tour-trend-chart" className="overflow-hidden">
-                  <SectionHeader
-                    icon={BarChart3}
-                    tone="success"
-                    title="Tren finansial 7 hari terakhir"
-                    description="Omzet harian dibanding target penjualan."
-                    actions={
-                      <Button asChild variant="outline" size="sm">
-                        <Link href="/reports">
-                          <FileText className="h-3.5 w-3.5" />
-                          <span>Laporan laba rugi</span>
-                        </Link>
-                      </Button>
-                    }
+              <CardContent className="space-y-3 p-5 sm:p-6">
+                {loading && recommendations.length === 0 ? (
+                  <div className="space-y-3">
+                    {[0, 1].map((i) => (
+                      <div key={i} className="h-40 animate-pulse rounded-xl bg-stone-100" />
+                    ))}
+                  </div>
+                ) : recommendations.length === 0 ? (
+                  <EmptyState
+                    icon={PackageCheck}
+                    title="Persediaan dalam kondisi prima"
+                    description="Stok seluruh gerai masih dalam batas aman. Belum ada mutasi yang perlu dilakukan hari ini."
                   />
-
-                  <CardContent className="p-5 sm:p-6">
-                    <div className="h-60 w-full">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <ComposedChart
-                          data={sevenDaysTrend}
-                          margin={{ top: 8, right: 8, bottom: 0, left: -12 }}
-                        >
-                          <CartesianGrid
-                            strokeDasharray="3 3"
-                            vertical={false}
-                            stroke="#EEECE7"
-                          />
-                          <XAxis
-                            dataKey="date"
-                            tickLine={false}
-                            axisLine={false}
-                            tick={{ fontSize: 12, fill: '#78716C' }}
-                            dy={8}
-                          />
-                          <YAxis
-                            tickLine={false}
-                            axisLine={false}
-                            width={52}
-                            tick={{ fontSize: 11, fill: '#A8A29E' }}
-                            tickFormatter={(value: number) =>
-                              `${Math.round(Number(value) / 1_000_000)} jt`
-                            }
-                          />
-                          <Tooltip
-                            content={<TrendTooltip />}
-                            cursor={{ fill: 'rgba(246, 130, 31, 0.06)' }}
-                          />
-                          <Bar
-                            dataKey="omzet"
-                            name="Omzet"
-                            fill="#F6821F"
-                            radius={[6, 6, 0, 0]}
-                            maxBarSize={40}
-                          />
-                          <Line
-                            dataKey="target"
-                            name="Target"
-                            type="monotone"
-                            stroke="#668D72"
-                            strokeWidth={2}
-                            strokeDasharray="4 4"
-                            dot={false}
-                          />
-                        </ComposedChart>
-                      </ResponsiveContainer>
-                    </div>
-
-                    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-stone-100 pt-4">
-                      <div className="flex items-center gap-4 text-xs text-stone-500">
-                        <span className="flex items-center gap-1.5">
-                          <span className="h-2 w-2 rounded-full bg-orange-500" />
-                          Omzet
-                        </span>
-                        <span className="flex items-center gap-1.5">
-                          <span className="h-2 w-2 rounded-full bg-sage-500" />
-                          Target
-                        </span>
-                      </div>
-                      <p className="text-xs text-stone-500">
-                        Rata-rata margin kotor{' '}
-                        <span className="font-medium text-emerald-700">
-                          {formatPercent(pnlWeek?.metrics.gross_margin_pct ?? 0)}
-                        </span>
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </>
-            )}
-
-            {/* TAB: PERFORMA CABANG */}
-            {activeTab === 'branches' && (
-              <Card className="overflow-hidden">
-                <SectionHeader
-                  icon={Building2}
-                  title={`Performa ${branchList.length} cabang aktif`}
-                  description="Pencapaian target penjualan dan kesehatan operasional tiap gerai."
-                  actions={
-                    <Button asChild variant="outline" size="sm">
-                      <Link href="/branches">Kelola cabang</Link>
-                    </Button>
-                  }
-                />
-
-                <CardContent className="space-y-3 p-5 sm:p-6">
-                  {branchList.map((branch) => (
+                ) : (
+                  <>
+                    {recommendations.slice(0, 2).map((rec) => (
                     <div
-                      key={branch.id}
-                      className="rounded-xl border border-stone-200/80 p-4 transition-colors hover:border-stone-300 sm:p-5"
+                      key={rec.id}
+                      className="rounded-xl border border-stone-200/80 bg-white p-4 sm:p-5"
                     >
-                      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
                           <p className="truncate text-sm font-medium text-stone-900">
-                            {branch.name}
+                            {rec.product_name}
                           </p>
-                          <p className="mt-0.5 text-xs text-stone-500">{branch.city}</p>
+                          <p className="mt-0.5 font-mono text-xs text-stone-400">
+                            {rec.sku}
+                          </p>
+                        </div>
+                        <Badge
+                          variant={rec.urgency === 'CRITICAL' ? 'danger' : 'intelligence'}
+                        >
+                          {rec.urgency === 'CRITICAL' ? 'Mendesak' : 'Disarankan'}
+                        </Badge>
+                      </div>
+
+                      <div className="mt-4 grid grid-cols-[1fr_auto_1fr] items-center gap-2 rounded-lg bg-stone-50/80 px-3 py-3 ring-1 ring-inset ring-stone-200/60">
+                        <div className="min-w-0">
+                          <p className="text-[11px] text-stone-400">Dari</p>
+                          <p className="truncate text-sm font-medium text-stone-800">
+                            {rec.from_branch_name}
+                          </p>
+                          <p className="mt-0.5 text-xs tabular-nums text-stone-500">
+                            {rec.from_current_stock} → {rec.from_stock_after} unit
+                          </p>
                         </div>
 
-                        <div className="sm:text-right">
-                          <p className="text-sm font-semibold tabular-nums text-stone-900">
-                            {formatRupiah(branch.revenue)}
+                        <div className="flex flex-col items-center gap-1 text-sage-600">
+                          <span className="rounded-full bg-sage-50 px-2 py-0.5 text-xs font-medium tabular-nums">
+                            +{rec.transfer_qty}
+                          </span>
+                          <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                        </div>
+
+                        <div className="min-w-0 text-right">
+                          <p className="text-[11px] text-stone-400">Ke</p>
+                          <p className="truncate text-sm font-medium text-stone-800">
+                            {rec.to_branch_name}
                           </p>
-                          <p className="mt-0.5 text-xs text-stone-400">
-                            {Math.round(branch.progress)}% dari target{' '}
-                            {formatRupiah(branch.dailyTarget)}
+                          <p className="mt-0.5 text-xs tabular-nums text-stone-500">
+                            {rec.to_current_stock} →{' '}
+                            <span className="font-medium text-emerald-700">
+                              {rec.to_stock_after}
+                            </span>{' '}
+                            unit
                           </p>
                         </div>
                       </div>
 
-                      <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-stone-100">
-                        <div
-                          className="h-full rounded-full bg-orange-400 transition-all"
-                          style={{ width: `${Math.min(100, Math.round(branch.progress))}%` }}
-                        />
-                      </div>
+                      <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <p className="text-xs leading-relaxed text-stone-500">
+                          Potensi hemat{' '}
+                          <span className="font-medium text-emerald-700">
+                            {formatRupiah(rec.net_benefit)}
+                          </span>{' '}
+                          · cukup untuk ±{rec.to_days_of_supply_after} hari
+                        </p>
 
-                      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-stone-500">
-                        <span>{branch.txCount} transaksi kemarin</span>
-                        <span>{branch.stockStatus}</span>
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          disabled={executingId === rec.id}
+                          onClick={() => handleExecuteTransfer(rec)}
+                          className="w-full shrink-0 sm:w-auto"
+                        >
+                          {executingId === rec.id ? (
+                            <>
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                              <span>Memproses...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Check className="h-3.5 w-3.5" />
+                              <span>Pindahkan {rec.transfer_qty} unit</span>
+                            </>
+                          )}
+                        </Button>
                       </div>
                     </div>
                   ))}
-                </CardContent>
-              </Card>
-            )}
+
+                    {recommendations.length > 2 && (
+                      <Button
+                        asChild
+                        variant="ghost"
+                        size="sm"
+                        className="w-full text-stone-600"
+                      >
+                        <Link href="/stock">
+                          <span>
+                            Lihat {recommendations.length - 2} saran lainnya
+                          </span>
+                          <ArrowRight className="h-3.5 w-3.5" />
+                        </Link>
+                      </Button>
+                    )}
+                  </>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* TREN FINANSIAL */}
+            <Card id="tour-trend-chart" className="overflow-hidden">
+              <SectionHeader
+                icon={BarChart3}
+                tone="success"
+                title="Tren finansial 7 hari terakhir"
+                description="Omzet harian dibanding target penjualan."
+                actions={
+                  <Button asChild variant="outline" size="sm">
+                    <Link href="/reports">
+                      <FileText className="h-3.5 w-3.5" />
+                      <span>Laporan laba rugi</span>
+                    </Link>
+                  </Button>
+                }
+              />
+
+              <CardContent className="p-5 sm:p-6">
+                <div className="h-60 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <ComposedChart
+                      data={sevenDaysTrend}
+                      margin={{ top: 8, right: 8, bottom: 0, left: -12 }}
+                    >
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        vertical={false}
+                        stroke="#EEECE7"
+                      />
+                      <XAxis
+                        dataKey="date"
+                        tickLine={false}
+                        axisLine={false}
+                        tick={{ fontSize: 12, fill: '#78716C' }}
+                        dy={8}
+                      />
+                      <YAxis
+                        tickLine={false}
+                        axisLine={false}
+                        width={52}
+                        tick={{ fontSize: 11, fill: '#A8A29E' }}
+                        tickFormatter={(value: number) =>
+                          `${Math.round(Number(value) / 1_000_000)} jt`
+                        }
+                      />
+                      <Tooltip
+                        content={<TrendTooltip />}
+                        cursor={{ fill: 'rgba(246, 130, 31, 0.06)' }}
+                      />
+                      <Bar
+                        dataKey="omzet"
+                        name="Omzet"
+                        fill="#F6821F"
+                        radius={[6, 6, 0, 0]}
+                        maxBarSize={40}
+                      />
+                      <Line
+                        dataKey="target"
+                        name="Target"
+                        type="monotone"
+                        stroke="#668D72"
+                        strokeWidth={2}
+                        strokeDasharray="4 4"
+                        dot={false}
+                      />
+                    </ComposedChart>
+                  </ResponsiveContainer>
+                </div>
+
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-stone-100 pt-4">
+                  <div className="flex items-center gap-4 text-xs text-stone-500">
+                    <span className="flex items-center gap-1.5">
+                      <span className="h-2 w-2 rounded-full bg-orange-500" />
+                      Omzet
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="h-2 w-2 rounded-full bg-sage-500" />
+                      Target
+                    </span>
+                  </div>
+                  <p className="text-xs text-stone-500">
+                    Rata-rata margin kotor{' '}
+                    <span className="font-medium text-emerald-700">
+                      {formatPercent(pnlWeek?.metrics.gross_margin_pct ?? 0)}
+                    </span>
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* ======================================================== */}
           {/* RAIL KANAN */}
           {/* ======================================================== */}
           <div className="space-y-6 lg:sticky lg:top-20 lg:col-span-4 lg:self-start">
-            <Card id="tour-target-card" className="overflow-hidden">
-              <SectionHeader icon={Target} title="Target harian per cabang" />
-              <CardContent className="space-y-4 px-5 pb-5 pt-6 sm:px-6 sm:pb-6 sm:pt-6">
+            <Card id="tour-performance-card" className="overflow-hidden">
+              <SectionHeader
+                icon={Building2}
+                title={`Performa ${branchList.length} cabang aktif`}
+              />
+
+              <CardContent className="space-y-3 p-5 sm:p-6">
                 {branchList.map((branch) => (
-                  <div key={branch.id} className="space-y-1.5">
-                    <div className="flex items-center justify-between gap-3 text-xs">
-                      <span className="truncate font-medium text-stone-700">
-                        {branch.name}
-                      </span>
-                      <span className="shrink-0 font-medium tabular-nums text-stone-900">
-                        {Math.round(branch.progress)}%
-                      </span>
+                  <div
+                    key={branch.id}
+                    className="rounded-xl border border-stone-200/80 p-4 transition-colors hover:border-stone-300 sm:p-5"
+                  >
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium text-stone-900">
+                          {branch.name}
+                        </p>
+                        <p className="mt-0.5 text-xs text-stone-500">{branch.city}</p>
+                      </div>
+
+                      <div className="sm:text-right">
+                        <p className="text-sm font-semibold tabular-nums text-stone-900">
+                          {formatRupiah(branch.revenue)}
+                        </p>
+                        <p className="mt-0.5 text-xs text-stone-400">
+                          {Math.round(branch.progress)}% dari target{' '}
+                          {formatRupiah(branch.dailyTarget)}
+                        </p>
+                      </div>
                     </div>
 
-                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-stone-100">
+                    <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-stone-100">
                       <div
                         className="h-full rounded-full bg-orange-400 transition-all"
                         style={{ width: `${Math.min(100, Math.round(branch.progress))}%` }}
                       />
                     </div>
 
-                    <div className="flex items-center justify-between text-[11px] tabular-nums text-stone-400">
-                      <span>{formatRupiah(branch.revenue)}</span>
-                      <span>dari {formatRupiah(branch.dailyTarget)}</span>
+                    <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-stone-500">
+                      <span>{branch.txCount} transaksi kemarin</span>
+                      <span>{branch.stockStatus}</span>
                     </div>
                   </div>
                 ))}
+
+                <Button
+                  asChild
+                  variant="ghost"
+                  size="sm"
+                  className="mt-1 w-full justify-between px-0 text-stone-600 hover:bg-transparent"
+                >
+                  <Link href="/branches">
+                    <span>Kelola cabang</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                </Button>
               </CardContent>
             </Card>
 
