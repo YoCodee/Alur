@@ -79,6 +79,18 @@ export function MigrationWizard() {
     void load();
   }, []);
 
+  // Impor katalog menambah SKU baru; daftar produk harus dimuat ulang supaya
+  // langkah penjualan tidak menandai SKU hasil impor sebagai "tidak ada".
+  const refreshProducts = useCallback(async () => {
+    try {
+      const res = await fetch('/api/products');
+      const json = await res.json();
+      if (res.ok && json.data) setProducts(json.data as ProductLite[]);
+    } catch {
+      // Pertahankan daftar lama; wizard tetap bisa dipakai.
+    }
+  }, []);
+
   const branchProducts = useMemo(
     () => products.filter((p) => p.branch_id === branchId),
     [products, branchId]
@@ -193,6 +205,8 @@ export function MigrationWizard() {
       }
 
       const unit = dataType === 'PRODUCTS' ? 'produk' : 'data';
+      // Katalog baru saja berubah — muat ulang sebelum langkah penjualan memakai peta SKU
+      if (dataType === 'PRODUCTS') await refreshProducts();
       setResultSummary(
         `Berhasil: ${created + updated} ${unit} (baru ${created}, diperbarui ${updated}).` +
         (invalidRows.length > 0 ? ` ${invalidRows.length} baris dilewati karena error.` : '')

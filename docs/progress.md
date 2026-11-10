@@ -2375,3 +2375,16 @@
 - `frontend/src/lib/tour/tour-steps.ts` — langkah tur `#tour-dashboard-tabs` dihapus (jangkarnya tidak ada lagi); langkah `#tour-target-card` diganti menjadi `#tour-performance-card` dengan teks yang sesuai isi kartu baru.
 
 **Verifikasi:** E2E Chrome headless CDP (owner demo, 11 pass, 0 fail, konsol bersih) — switcher tab tidak ada lagi, "Apa yang perlu diperhatikan?" + kartu tren/mutasi tampil langsung, `#tour-performance-card` ada di rail kanan dan `#tour-target-card`/judul "Target harian per cabang" hilang, seluruh jangkar tur dashboard lengkap, dan lebar 360 px tanpa overflow horizontal. Screenshot 1280 px & 768 px diperiksa: header kartu performa kini satu baris dan tautan "Kelola cabang" sejajar dengan pola rail lainnya. `npm run typecheck` lulus; `npm run lint` lulus dengan 1 warning font lama di `src/app/layout.tsx`; `npm run test` lulus (22 file, 201 tes).
+
+## Perbaikan Bug Impor: SKU Katalog Hasil Impor Belum Dikenal di Langkah Penjualan (10 Nov 2026)
+
+**Masalah:** user mengimpor katalog, lalu langsung lanjut mengimpor penjualan — semua baris ditandai `Kode produk tidak ada di katalog cabang ini` padahal produknya baru saja diimpor. Setelah membuka halaman lain dan kembali ke `/import`, impor penjualan berjalan normal.
+
+**Akar masalah:** `MigrationWizard` mengambil daftar produk hanya **sekali saat mount** (`useEffect` dengan dependency kosong) dan menyimpannya di state `products`; peta `skuToId` yang dipakai menandai baris penjualan tidak dikenal diturunkan dari state itu. Impor katalog tidak pernah memuat ulang daftar tersebut, jadi SKU baru tetap tidak dikenal sampai komponen di-mount ulang — itulah mengapa pindah halaman lalu kembali terasa "memperbaiki" bug-nya.
+
+**Perbaikan:**
+- `frontend/src/components/import/migration-wizard.tsx` — tambah `refreshProducts()` (memuat ulang `/api/products`, gagal diabaikan agar wizard tetap jalan) dan memanggilnya di `handleCommit` setelah impor katalog sukses, sebelum ringkasan ditampilkan. State `products` ikut berubah sehingga `skuToId`, `unknownSkuLines`, `validRows`, dan `invalidRows` dihitung ulang otomatis.
+
+**Verifikasi:** E2E Chrome headless CDP dengan alur persis laporan user, dijalankan pada dua keadaan — **kode lama dulu (reproduksi):** impor katalog 2 produk sukses, lalu impor penjualan → 3/3 baris `Kode produk tidak ada di katalog cabang ini`, 0 baris siap; **sesudah fix:** jalur yang sama **6 pass, 0 fail** (3/3 baris siap, impor penjualan sukses "Berhasil: 2 data"), konsol bersih. `npm run typecheck` lulus; `npm run lint` lulus; `npm run test` lulus (22 file, 201 tes). Data uji (2 produk `UJIIMP-*`, 2 transaksi, 2 mutasi stok, baris `import_jobs`) sudah dibersihkan kembali.
+
+**Catatan:** tidak ada unit test komponen untuk perbaikan ini karena konfigurasi Vitest memakai `environment: 'node'` tanpa jsdom dan repo belum punya satu pun test komponen; verifikasi memakai E2E browser. Menambah jsdom berarti menambah dependency baru, jadi tidak dilakukan.
