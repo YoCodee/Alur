@@ -4,6 +4,7 @@ import {
   getYesterday,
   getRelativeBusinessDate,
   formatDateId,
+  formatDateTimeId,
   isFutureWib,
 } from '@/lib/date';
 
@@ -56,6 +57,26 @@ describe('formatDateId', () => {
   it('formats date in Indonesian locale', () => {
     const date = new Date('2026-11-03T10:00:00+07:00');
     expect(formatDateId(date, 'd MMM yyyy')).toBe('3 Nov 2026');
+  });
+});
+
+describe('formatDateTimeId', () => {
+  it('renders a date-only business date without a fake 00:00', () => {
+    expect(formatDateTimeId('2026-11-10')).toBe('10 Nov');
+    expect(formatDateTimeId('2026-11-10')).not.toMatch(/:\d{2}/);
+  });
+
+  it('keeps the year when the pattern includes one', () => {
+    expect(formatDateTimeId('2026-11-10', 'd MMM yyyy, HH:mm')).toBe('10 Nov 2026');
+  });
+
+  it('keeps the exact time of a real timestamp (unchanged behaviour)', () => {
+    const ts = '2026-11-10T07:15:00.000Z';
+    expect(formatDateTimeId(ts)).toBe(formatDateId(ts, 'd MMM, HH:mm'));
+    expect(formatDateTimeId(ts)).toMatch(/, \d{2}:\d{2}$/);
+    expect(formatDateTimeId(ts, 'd MMM yyyy, HH:mm')).toBe(
+      formatDateId(ts, 'd MMM yyyy, HH:mm')
+    );
   });
 });
 

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { formatRupiah } from '@/lib/format';
-import { formatDateId, getBusinessDate } from '@/lib/date';
+import { formatDateTimeId, getBusinessDate } from '@/lib/date';
 import { MetricStrip, MetricItem } from '@/components/ui/metric-strip';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -514,7 +514,7 @@ export default function TransactionsPage() {
                         #{tx.id.slice(0, 8)}
                       </td>
                       <td className="py-3.5 px-4 text-slate-600 whitespace-nowrap">
-                        {formatDateId(tx.transaction_date || tx.business_date, 'd MMM yyyy, HH:mm')}
+                        {formatDateTimeId(tx.transaction_date || tx.business_date, 'd MMM yyyy, HH:mm')}
                       </td>
                       <td className="py-3.5 px-4 font-medium text-slate-800">
                         {branchMap.get(tx.branch_id) || 'Cabang'}
@@ -657,7 +657,7 @@ export default function TransactionsPage() {
                   <p className="pt-0.5">Alasan: {selectedTx.void_reason || '-'}</p>
                   {selectedTx.voided_at && (
                     <p className="text-[10px] text-rose-600 font-mono">
-                      Waktu Pembatalan: {formatDateId(selectedTx.voided_at, 'd MMM yyyy, HH:mm')} WIB
+                      Waktu Pembatalan: {formatDateTimeId(selectedTx.voided_at, 'd MMM yyyy, HH:mm')} WIB
                     </p>
                   )}
                 </div>
@@ -674,7 +674,7 @@ export default function TransactionsPage() {
                 <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
                   <span className="text-slate-500 block text-[11px]">Waktu Transaksi</span>
                   <span className="font-bold text-slate-800">
-                    {formatDateId(selectedTx.transaction_date || selectedTx.business_date, 'd MMM, HH:mm')} WIB
+                    {formatDateTimeId(selectedTx.transaction_date || selectedTx.business_date, 'd MMM, HH:mm')} WIB
                   </span>
                 </div>
                 <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">

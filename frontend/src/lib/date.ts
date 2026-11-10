@@ -60,6 +60,20 @@ export function formatDateId(
 }
 
 /**
+ * Formats a value that may be either a full timestamp or a date-only string
+ * (business dates such as `expense_date`, `briefing_date`, `business_date`).
+ * A date-only input has no clock time, so the time segment is dropped instead
+ * of rendering a fake "00:00".
+ *
+ * Example: "10 Nov, 14:32" for a timestamp, "10 Nov" for "2026-11-10".
+ */
+export function formatDateTimeId(date: Date | string | number, formatPattern = 'd MMM, HH:mm'): string {
+  const isDateOnly = typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date.trim());
+  if (!isDateOnly) return formatDateId(date, formatPattern);
+  return formatDateId(date, formatPattern.replace(/,\s*HH:mm.*$/, ''));
+}
+
+/**
  * Checks if a given date string is in the future relative to today's WIB date.
  */
 export function isFutureWib(dateString: string): boolean {

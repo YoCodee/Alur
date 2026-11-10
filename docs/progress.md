@@ -2388,3 +2388,16 @@
 **Verifikasi:** E2E Chrome headless CDP dengan alur persis laporan user, dijalankan pada dua keadaan — **kode lama dulu (reproduksi):** impor katalog 2 produk sukses, lalu impor penjualan → 3/3 baris `Kode produk tidak ada di katalog cabang ini`, 0 baris siap; **sesudah fix:** jalur yang sama **6 pass, 0 fail** (3/3 baris siap, impor penjualan sukses "Berhasil: 2 data"), konsol bersih. `npm run typecheck` lulus; `npm run lint` lulus; `npm run test` lulus (22 file, 201 tes). Data uji (2 produk `UJIIMP-*`, 2 transaksi, 2 mutasi stok, baris `import_jobs`) sudah dibersihkan kembali.
 
 **Catatan:** tidak ada unit test komponen untuk perbaikan ini karena konfigurasi Vitest memakai `environment: 'node'` tanpa jsdom dan repo belum punya satu pun test komponen; verifikasi memakai E2E browser. Menambah jsdom berarti menambah dependency baru, jadi tidak dilakukan.
+
+## Perbaikan Jam "00:00" Palsu di Panel "Apa yang perlu diperhatikan?" (10 Nov 2026)
+
+**Masalah:** baris anomali di dashboard menampilkan `Jogja · 10 Nov, 00:00` — jamnya selalu `00:00`.
+
+**Akar masalah:** `detected_at` untuk anomali pengeluaran diisi **tanggal bisnis**, bukan timestamp — `expenses.expense_date` (`frontend/src/app/api/anomalies/route.ts`, blok anomali hidup) dan `ml_recommendations.briefing_date` (baris `detected_at: rec.briefing_date || rec.created_at`) — yaitu string `YYYY-MM-DD` tanpa komponen jam. Nilai itu lalu dirender dengan `formatDateId(detected_at, 'd MMM, HH:mm')`; `parseISO('2026-11-10')` jatuh ke tengah malam dan `toZonedTime` mempertahankan komponen jamnya, sehingga selalu tampil `00:00`. Jadi bukan nilai dari input pengeluaran yang salah, melainkan format tampilan yang memaksakan jam pada nilai tanggal-saja.
+
+**Perbaikan:**
+- `frontend/src/lib/date.ts` — helper baru `formatDateTimeId(value, pattern)`: untuk nilai tanggal-saja (`YYYY-MM-DD`) segmen jam dibuang dari pola, untuk timestamp penuh perilakunya persis sama dengan `formatDateId`.
+- `frontend/src/app/(app)/dashboard/page.tsx` — baris meta anomali (`branch · detected_at`) memakai helper baru.
+- `frontend/src/app/(app)/transactions/page.tsx` — 3 titik yang memakai fallback `transaction_date || business_date` (tanggal-saja bila `transaction_date` kosong) dan `voided_at` ikut memakai helper; output untuk timestamp tidak berubah sama sekali.
+
+**Verifikasi:** 3 unit test baru di `tests/lib/date.test.ts` (tanggal-saja tanpa jam, pola bertahun, timestamp identik dengan format lama). Probe runtime: `formatDateId('2026-11-10', 'd MMM, HH:mm')` = `10 Nov, 00:00` (bug) → `formatDateTimeId('2026-11-10')` = `10 Nov`; `2026-11-10T07:15Z` tetap `10 Nov, 14:15` (WIB). E2E dashboard (owner demo): 8 baris "Apa yang perlu diperhatikan?" — 7 baris tanggal-saja kini tanpa `00:00`, 1 baris timestamp asli tetap berjam (`9 Nov, 02:27`), konsol bersih (2 pass, 0 fail). `npm run typecheck` lulus; `npm run lint` lulus; `npm run test` lulus (22 file, 204 tes).

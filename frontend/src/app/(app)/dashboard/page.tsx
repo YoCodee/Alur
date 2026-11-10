@@ -16,7 +16,7 @@ import {
 } from 'recharts';
 import { RoleGuard } from '@/components/role-guard';
 import { formatRupiah, formatPercent } from '@/lib/format';
-import { formatDateId } from '@/lib/date';
+import { formatDateId, formatDateTimeId } from '@/lib/date';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -630,7 +630,7 @@ export default function DashboardPage() {
                                 </p>
                                 <p className="mt-2 text-xs text-stone-400">
                                   {anom.branch_name || 'Seluruh cabang'} ·{' '}
-                                  {formatDateId(anom.detected_at, 'd MMM, HH:mm')}
+                                  {formatDateTimeId(anom.detected_at)}
                                 </p>
                               </div>
                             </div>
