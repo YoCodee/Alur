@@ -54,11 +54,6 @@ alur/
 │   ├── schema.sql              # 12 Tabel, indeks, trigger WIB & batas cabang
 │   ├── functions.sql           # RPC Security Definer (create_sale, restock, dll.)
 │   └── rls.sql                 # Row Level Security & column-level GRANT
-├── docs/                       # Dokumentasi spesifikasi & progres
-│   ├── AGENTS.md               # Konvensi kode & panduan pengembangan
-│   ├── assumptions.md          # Log keputusan teknis & arsitektur
-│   ├── prdBigPulze.md          # Spesifikasi fungsional & modul sistem
-│   └── progress.md             # Status & tracking implementasi
 ├── frontend/                   # Aplikasi Next.js (Fullstack)
 │   ├── src/
 │   │   ├── app/                # App Router (Pages, Layouts, API Routes)

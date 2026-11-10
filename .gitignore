@@ -38,3 +38,8 @@ yarn-error.log*
 
 # Impeccable (design critique snapshots)
 .impeccable/
+
+
+# Internal docs & design references
+docs/
+redesign/
